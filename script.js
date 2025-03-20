@@ -173,10 +173,7 @@ function initApp() {
     
     // Выполняем все оптимизации с разными задержками для улучшения опыта загрузки
     setTimeout(() => {
-        optimizeTouchEvents();
-    }, 300);
-    
-    setTimeout(() => {
+        // Оптимизируем DOM операции
         optimizeDOMOperations();
     }, 1000);
     
@@ -567,11 +564,18 @@ function initApp() {
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         
         if (isTouchDevice) {
+            console.log("Оптимизируем сенсорные события для кнопок");
+            
             // Получаем все кнопки
             const buttons = document.querySelectorAll('button');
             
             // Добавляем обработчики для всех кнопок
             buttons.forEach(button => {
+                // Пропускаем кнопки, которые уже имеют обработчики touch
+                if (button.getAttribute('touch-optimized') === 'true') {
+                    return;
+                }
+                
                 // Добавляем визуальную обратную связь при нажатии
                 button.addEventListener('touchstart', function(e) {
                     this.classList.add('touch-active');
@@ -609,6 +613,9 @@ function initApp() {
                     this.classList.remove('touch-active');
                     this.classList.remove('processing-click');
                 }, { passive: true });
+                
+                // Помечаем кнопку как обработанную
+                button.setAttribute('touch-optimized', 'true');
             });
             
             // Добавляем стили для активных состояний
@@ -936,17 +943,60 @@ function initApp() {
     }
 
     // Добавляем обработчик для новой кнопки активации аватара
-    activateAvatarBtn.addEventListener('click', openActivateModal);
+    if (activateAvatarBtn) {
+        console.log("Добавляем обработчик для кнопки активации аватара");
+        activateAvatarBtn.addEventListener('click', openActivateModal);
+        
+        // Специальная оптимизация для кнопки активации на сенсорных устройствах
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+            console.log("Добавляем сенсорные обработчики для кнопки активации");
+            
+            activateAvatarBtn.addEventListener('touchstart', function(e) {
+                this.classList.add('touch-active');
+                e.preventDefault();
+            }, { passive: false });
+            
+            activateAvatarBtn.addEventListener('touchend', function(e) {
+                this.classList.remove('touch-active');
+                e.preventDefault();
+                
+                console.log('TouchEnd на кнопке активации');
+                
+                if (!this.classList.contains('processing-click')) {
+                    this.classList.add('processing-click');
+                    
+                    setTimeout(() => {
+                        console.log('Симулируем клик на кнопке активации');
+                        openActivateModal();
+                        this.classList.remove('processing-click');
+                    }, 10);
+                }
+            }, { passive: false });
+            
+            activateAvatarBtn.addEventListener('touchcancel', function() {
+                this.classList.remove('touch-active');
+                this.classList.remove('processing-click');
+            }, { passive: true });
+            
+            activateAvatarBtn.setAttribute('touch-optimized', 'true');
+        }
+    }
 
     // Добавляем обработчик для кнопки активации в модальном окне
     const activateBotBtn = document.getElementById('activate-bot-btn');
-    activateBotBtn.addEventListener('click', function() {
-        // Закрываем модальное окно
-        closeActivateModal();
-        
-        // Открываем бота в Telegram
-        openTelegramBot();
-    });
+    if (activateBotBtn) {
+        console.log("Добавляем обработчик для кнопки активации бота");
+        activateBotBtn.addEventListener('click', function() {
+            // Закрываем модальное окно
+            closeActivateModal();
+            
+            // Открываем бота в Telegram
+            openTelegramBot();
+        });
+    }
+
+    // Применяем оптимизацию touch-событий после добавления всех обработчиков
+    optimizeTouchEvents();
 }
 
 // Функция для создания пиксельного аватара с плавными анимациями
