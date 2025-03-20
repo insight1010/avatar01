@@ -1308,4 +1308,50 @@ h1 {
 .additional-info {
     font-size: 0.8rem;
     line-height: 1.28;
+}
+
+/* Стиль для списка функций бота без галочек */
+.features-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0.8rem 0;
+}
+
+.features-list li {
+    position: relative;
+    margin-bottom: 0.4rem;
+    padding-left: 1rem;
+    line-height: 1.3;
+}
+
+.features-list li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #00d2ff;
+}
+
+/* Стиль для списка шагов активации без галочек */
+.steps-list {
+    list-style-type: none;
+    counter-reset: step-counter;
+    padding: 0;
+    margin: 0.8rem 0;
+    text-align: left;
+}
+
+.steps-list li {
+    position: relative;
+    margin-bottom: 0.4rem;
+    padding-left: 1.8rem;
+    line-height: 1.3;
+}
+
+.steps-list li:before {
+    content: counter(step-counter) ".";
+    counter-increment: step-counter;
+    position: absolute;
+    left: 0;
+    color: #00d2ff;
+    font-weight: bold;
 } 
