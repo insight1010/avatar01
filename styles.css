@@ -497,9 +497,10 @@ h1 {
     100% { transform: translateX(100%); }
 }
 
+/* Отключаем hover эффекты для заблокированных кнопок */
 .action-button.locked:hover {
     transform: none;
-    box-shadow: 0 0 12px rgba(0, 210, 255, 0.2);
+    box-shadow: none;
 }
 
 /* Иконка ожидания */
@@ -555,7 +556,7 @@ h1 {
     border-top: 8px solid rgba(0, 15, 30, 0.95);
 }
 
-/* Анимированный ховер-эффект для всплывающей подсказки */
+/* Показываем подсказку при наведении без анимации */
 .action-button.locked:hover .lock-message {
     opacity: 1;
     visibility: visible;
