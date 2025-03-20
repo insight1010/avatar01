@@ -148,8 +148,8 @@ h1 {
     will-change: transform;
     backface-visibility: hidden;
     transform: translate3d(0, 0, 0);
-    transition: transform 0.2s linear;
-    box-shadow: none !important;
+    transition: transform 0.5s ease-out;
+    box-shadow: none; /* Убираем тень для производительности */
 }
 
 .siri-highlight {
@@ -158,26 +158,39 @@ h1 {
 }
 
 .siri-core {
-    will-change: transform, opacity, box-shadow;
+    will-change: transform, opacity;
     pointer-events: none;
-    animation: none !important;
-    background: rgba(0, 210, 255, 0.7) !important;
-    box-shadow: 0 0 10px rgba(0, 210, 255, 0.4) !important;
 }
 
+/* Анимация пульсации для центрального элемента */
+@keyframes corePulse {
+    0% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(0.95);
+        box-shadow: 0 0 15px rgba(0, 210, 255, 0.6), 0 0 25px rgba(0, 180, 230, 0.3);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.05);
+        box-shadow: 0 0 25px rgba(0, 210, 255, 0.8), 0 0 40px rgba(0, 180, 230, 0.5);
+    }
+}
+
+/* Анимация свечения для фона аватара */
 .avatar-glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    height: 90%;
-    background: radial-gradient(circle at center, rgba(0, 210, 255, 0.15) 10%, rgba(130, 10, 210, 0.1) 50%, transparent 70%);
-    border-radius: 50%;
-    animation: glowRadiate 8s infinite alternate;
-    z-index: 0;
     pointer-events: none;
-    backdrop-filter: blur(5px);
+    animation: glowPulse 6s infinite alternate ease-in-out;
+}
+
+@keyframes glowPulse {
+    0% {
+        opacity: 0.6;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    100% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
 }
 
 /* Добавляем стили для робота */
@@ -429,51 +442,48 @@ h1 {
 }
 
 .action-button.locked {
+    opacity: 0.65;
     cursor: not-allowed;
-    filter: grayscale(0.5);
-    opacity: 0.8;
+    position: relative;
+    color: rgba(255, 255, 255, 0.7);
+    background: linear-gradient(45deg, #333, #444);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.action-button.locked::after {
-    content: '🔒';
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 1.2rem;
-    text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
-    animation: lockPulse 2s infinite;
+.action-button.locked:hover {
+    transform: none;
+    background: linear-gradient(45deg, #333, #444);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-@keyframes lockPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+.lock-icon {
+    font-size: 14px;
+    margin-left: 8px;
+    opacity: 0.7;
 }
 
 .lock-message {
     position: absolute;
-    bottom: -40px;
-    left: 0;
-    width: 100%;
-    background: rgba(16, 30, 40, 0.9);
-    color: white;
-    padding: 0.5rem;
-    font-size: 0.85rem;
-    border-radius: 8px;
-    z-index: 10;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    transform: translateY(-10px);
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    background-color: rgba(40, 45, 60, 0.95);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    border: 1px solid rgba(0, 210, 255, 0.15);
-    text-align: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    z-index: 10;
 }
 
-.locked:hover .lock-message {
-    transform: translateY(0);
+.action-button.locked:hover .lock-message {
     opacity: 1;
     visibility: visible;
+    transform: translateX(-50%) translateY(0);
 }
 
 .btn-1 {
@@ -1042,49 +1052,6 @@ h1 {
     transform: translateY(0);
 }
 
-/* Заблокированные кнопки */
-.locked {
-    opacity: 0.7;
-    cursor: not-allowed;
-    position: relative;
-    overflow: visible;
-}
-
-.lock-icon {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1rem;
-    opacity: 0.8;
-}
-
-.lock-message {
-    position: absolute;
-    bottom: -40px;
-    left: 0;
-    width: 100%;
-    background: rgba(16, 30, 40, 0.9);
-    color: white;
-    padding: 0.5rem;
-    font-size: 0.85rem;
-    border-radius: 8px;
-    z-index: 10;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    transform: translateY(-10px);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0, 210, 255, 0.15);
-    text-align: center;
-}
-
-.locked:hover .lock-message {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
-}
-
 /* CSS for particles canvas */
 .particles-canvas {
     pointer-events: none;
@@ -1110,5 +1077,17 @@ h1 {
     100% {
         opacity: 1;
         box-shadow: 0 0 25px rgba(0, 210, 255, 0.8), 0 0 50px rgba(130, 10, 210, 0.5);
+    }
+}
+
+/* Упрощенная анимация пульсации */
+@keyframes simplePulse {
+    0% {
+        opacity: 0.7;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.15);
     }
 } 
