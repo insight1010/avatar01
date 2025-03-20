@@ -593,7 +593,7 @@ h1 {
 .modal-content {
     background: rgba(16, 30, 40, 0.9);
     border-radius: 12px;
-    padding: 2rem;
+    padding: 16px;
     width: 90%;
     max-width: 600px;
     position: relative;
@@ -822,7 +822,7 @@ h1 {
 }
 
 .info-details {
-    margin-top: 1.5rem;
+    margin-top: 0.8rem;
 }
 
 .info-details p {
@@ -1012,6 +1012,7 @@ h1 {
 /* Стили для модального окна бота */
 .bot-modal-content {
     max-width: 550px;
+    padding: 16px;
 }
 
 .bot-section {
@@ -1020,7 +1021,7 @@ h1 {
     background: rgba(10, 20, 30, 0.6);
     padding: 1rem;
     border-radius: 8px;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.8rem;
     border-left: 3px solid #6a00f4;
 }
 
@@ -1067,19 +1068,19 @@ h1 {
 .command-block {
     background: rgba(10, 20, 30, 0.8);
     border-left: 3px solid #6a00f4;
-    padding: 0.8rem 1rem;
+    padding: 0.4rem 0.6rem;
     font-family: 'Courier New', monospace;
     color: #00d2ff;
     font-weight: bold;
-    margin: 1rem 0;
+    margin: 0.4rem 0;
     border-radius: 4px;
     display: inline-block;
 }
 
 .telegram-connect {
     text-align: center;
-    margin: 1.5rem 0;
-    padding: 1rem;
+    margin: 1.2rem 0;
+    padding: 0.8rem;
     background: rgba(10, 20, 30, 0.4);
     border-radius: 8px;
 }
@@ -1230,4 +1231,81 @@ h1 {
     font-weight: 600;
     margin-bottom: 1.5rem;
     text-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+}
+
+/* Уменьшенные размеры для модальных окон */
+.modal-content h2 {
+    font-size: 1.44rem; /* 1.8rem * 0.8 */
+    margin-bottom: 1.2rem; /* 1.5rem * 0.8 */
+}
+
+.activate-modal-content h2,
+.bot-modal-content h2 {
+    font-size: 1.44rem; /* 1.8rem * 0.8 */
+    margin-bottom: 1.2rem;
+}
+
+.activate-modal-content .info-details,
+.bot-modal-content .info-details {
+    font-size: 0.88rem; /* 1.1rem * 0.8 */
+}
+
+.activate-modal-content p,
+.bot-modal-content p {
+    margin-bottom: 0.8rem; /* 1rem * 0.8 */
+    line-height: 1.28; /* 1.6 * 0.8 */
+}
+
+.activate-modal-content ul,
+.bot-modal-content ul {
+    margin: 0.4rem 0;
+    padding-left: 0.2rem;
+}
+
+.activate-modal-content li,
+.bot-modal-content li {
+    margin-bottom: 0.2rem;
+    padding-left: 0.2rem;
+}
+
+.bot-section {
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+}
+
+.bot-avatar {
+    width: 56px;
+    height: 56px;
+    margin-right: 0.8rem;
+}
+
+.bot-info h3 {
+    margin: 0 0 0.4rem 0;
+    font-size: 0.96rem;
+}
+
+.status-tag {
+    padding: 0.16rem 0.4rem;
+    font-size: 0.64rem;
+}
+
+.command-block {
+    padding: 0.4rem 0.6rem;
+    margin: 0.4rem 0;
+    font-size: 0.88rem;
+}
+
+.telegram-connect {
+    margin: 1.2rem 0;
+    padding: 0.8rem;
+}
+
+.telegram-connect ol {
+    padding-left: 16px;
+    margin-bottom: 12px;
+}
+
+.additional-info {
+    font-size: 0.8rem;
+    line-height: 1.28;
 } 
