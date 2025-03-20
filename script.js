@@ -307,11 +307,19 @@ function createPixelAvatar(container) {
     // Создаем фрагмент для оптимизации отрисовки
     const fragment = document.createDocumentFragment();
     
-    // Размер сетки
-    const gridSize = 12;
+    // Размер сетки - увеличиваем для более детального вида
+    const gridSize = 14;
     
-    // Вероятность заполнения пикселей (оптимизировано)
+    // Вероятность заполнения пикселей
     const fillProbability = 0.45;
+    
+    // Цвета для пикселей - добавляем больше красивых оттенков
+    const colors = [
+         'rgba(0, 210, 255, 0.85)',  // Голубой (ярче)
+         'rgba(70, 140, 255, 0.85)',  // Синий (ярче)
+         'rgba(130, 10, 210, 0.75)',   // Фиолетовый (ярче)
+         'rgba(90, 230, 255, 0.85)'   // Светло-голубой (ярче)
+    ];
     
     // Создаем меньше пикселей для улучшения производительности
     for (let i = 0; i < gridSize; i++) {
@@ -328,6 +336,18 @@ function createPixelAvatar(container) {
                 pixel.style.top = `${(i / gridSize) * 100}%`;
                 pixel.style.left = `${(j / gridSize) * 100}%`;
                 
+                // Применяем случайный цвет из палитры для более красивого эффекта
+                const colorIndex = Math.floor(Math.random() * colors.length);
+                pixel.style.backgroundColor = colors[colorIndex];
+                
+                // Добавляем прозрачность (больше к краям)
+                const centerX = gridSize / 2;
+                const centerY = gridSize / 2;
+                const distFromCenter = Math.sqrt(Math.pow(i - centerX, 2) + Math.pow(j - centerY, 2));
+                const maxDist = Math.sqrt(Math.pow(gridSize, 2) + Math.pow(gridSize, 2)) / 2;
+                const edgeFactor = 1 - (distFromCenter / maxDist) * 0.7;
+                pixel.style.opacity = (Math.random() * 0.4 + 0.4) * edgeFactor;
+                
                 // Оптимизация: уменьшаем количество анимаций
                 if ((i+j) % 4 === 0) {
                     // Применяем анимацию только к каждому четвертому пикселю
@@ -341,20 +361,23 @@ function createPixelAvatar(container) {
         }
     }
     
-    // Создаём меньше декоративных элементов 
-    for (let i = 0; i < 4; i++) {
+    // Создаём декоративные элементы на краях
+    for (let i = 0; i < 6; i++) {
         const outerPixel = document.createElement('div');
         outerPixel.className = 'outer-pixel';
         
         // Устанавливаем позицию без лишних вычислений
-        const angle = (i / 4) * 360;
-        const distance = 40 + Math.random() * 20;
+        const angle = (i / 6) * 360;
+        const distance = 45 + Math.random() * 15;
         
         outerPixel.style.top = `calc(50% + ${Math.sin(angle * Math.PI / 180) * distance}px)`;
         outerPixel.style.left = `calc(50% + ${Math.cos(angle * Math.PI / 180) * distance}px)`;
         
-        // Применяем только необходимые стили
-        outerPixel.style.opacity = 0.6 + Math.random() * 0.4;
+        // Применяем цвета и стили
+        const colorIndex = Math.floor(Math.random() * colors.length);
+        outerPixel.style.backgroundColor = colors[colorIndex];
+        outerPixel.style.opacity = 0.3 + Math.random() * 0.3;
+        outerPixel.style.boxShadow = '0 0 8px rgba(0, 210, 255, 0.5)';
         
         // Оптимизация: более простая анимация
         const animDuration = 4 + Math.random() * 2;
@@ -364,22 +387,46 @@ function createPixelAvatar(container) {
         fragment.appendChild(outerPixel);
     }
     
+    // Добавляем элемент для "дыхания" аватара
+    const pulse = document.createElement('div');
+    pulse.className = 'avatar-pulse';
+    fragment.appendChild(pulse);
+    
     // Единоразовое добавление всех элементов
     container.appendChild(fragment);
 }
 
-// Оптимизация анимаций
+// Оптимизация анимаций с более красивыми эффектами
 // Убираем лишние кадры анимации
 const style = document.createElement('style');
 style.textContent = `
 @keyframes pixelPulse {
-    0% { transform: scale(0.8); opacity: 0.4; }
-    100% { transform: scale(1.2); opacity: 0.8; }
+    0% { transform: scale(0.8); opacity: 0.4; filter: blur(0px); }
+    100% { transform: scale(1.2); opacity: 0.8; filter: blur(1px); }
 }
 
 @keyframes outerPixelPulse {
-    0% { transform: scale(0.9); opacity: 0.3; }
-    100% { transform: scale(1.1); opacity: 0.6; }
+    0% { transform: scale(0.9) translateY(0); opacity: 0.3; }
+    100% { transform: scale(1.1) translateY(-3px); opacity: 0.6; }
+}
+
+.avatar-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, rgba(0, 210, 255, 0.2), transparent 70%);
+    filter: blur(8px);
+    animation: avatarPulse 4s infinite alternate ease-in-out;
+    pointer-events: none;
+}
+
+@keyframes avatarPulse {
+    0% { opacity: 0.2; width: 60%; height: 60%; }
+    100% { opacity: 0.6; width: 75%; height: 75%; }
 }
 `;
 document.head.appendChild(style);
