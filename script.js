@@ -112,6 +112,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Установим начальное значение - 4 дня из 30
             daysPassed.textContent = '4';
             animateProgressBar();
+            
+            // Сразу обновляем счетчики оставшихся дней
+            const currentDays = parseInt(daysPassed.textContent);
+            updateRemainingDays(currentDays);
         } else {
             console.error("Элементы прогресс-бара не найдены");
         }
@@ -252,6 +256,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Добавляем уведомление в очередь
                 notifications.push(item.message);
+            }
+            
+            // Обновляем значения оставшихся дней в иконках блокировки
+            if (daysCount < item.threshold) {
+                const lockIcon = item.button.querySelector('.lock-icon');
+                if (lockIcon) {
+                    const daysLeft = item.threshold - daysCount;
+                    lockIcon.textContent = `⏱️ ${daysLeft}д`;
+                }
             }
         }
         
@@ -1205,4 +1218,25 @@ function createDigitalParticles() {
         // Добавляем все элементы за одну операцию
         container.appendChild(fragment);
     }
+}
+
+// Функция для обновления счетчиков оставшихся дней
+function updateRemainingDays(currentDays) {
+    // Определяем пороги и соответствующие кнопки
+    const thresholds = [
+        { button: addBotBtn, days: 7 },
+        { button: connectChatsBtn, days: 14 },
+        { button: connectArBtn, days: 30 }
+    ];
+    
+    // Обновляем значения для каждой кнопки
+    thresholds.forEach(item => {
+        if (currentDays < item.days) {
+            const lockIcon = item.button.querySelector('.lock-icon');
+            if (lockIcon) {
+                const daysLeft = item.days - currentDays;
+                lockIcon.textContent = `⏱️ ${daysLeft}д`;
+            }
+        }
+    });
 } 

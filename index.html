@@ -2,13 +2,17 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#10002b">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!-- Отключение кэширования для миниапп -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Живой Аватар | Ваша цифровая память</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,20 +29,50 @@
             color: #fff;
             font-family: 'Poppins', sans-serif;
             overscroll-behavior: none;
+            position: relative;
+            /* Необходимые стили для iOS устройств с вырезами */
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
             height: 100%;
+        }
+        /* Стили для индикатора загрузки */
+        #loading-overlay {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: #0f2027; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 9999; 
+            transition: opacity 0.3s ease;
+        }
+        .loader {
+            width: 50px; 
+            height: 50px; 
+            border: 3px solid rgba(0,210,255,0.3); 
+            border-radius: 50%; 
+            border-top-color: #00d2ff; 
+            animation: loader-spin 1s linear infinite;
+        }
+        @keyframes loader-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <!-- Индикатор загрузки -->
-    <div id="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f2027; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.3s ease;">
+    <div id="loading-overlay">
         <div style="text-align: center;">
-            <div style="width: 50px; height: 50px; border: 3px solid rgba(0,210,255,0.3); border-radius: 50%; border-top-color: #00d2ff; animation: loader-spin 1s linear infinite;"></div>
+            <div class="loader"></div>
             <p style="margin-top: 10px; color: #fff; font-family: 'Poppins', sans-serif;">Загрузка...</p>
         </div>
     </div>
@@ -71,17 +105,17 @@
                 </button>
                 <button id="add-bot-btn" class="action-button btn-2 locked">
                     Добавить бот в чаты
-                    <span class="lock-icon">⏳</span>
+                    <span class="lock-icon">⏱️ 3д</span>
                     <div class="lock-message">Доступно после 7 дней обучения</div>
                 </button>
                 <button id="connect-chats-btn" class="action-button btn-3 locked">
                     Подключить к записям разговоров
-                    <span class="lock-icon">⏳</span>
+                    <span class="lock-icon">⏱️ 10д</span>
                     <div class="lock-message">Доступно после 14 дней обучения</div>
                 </button>
                 <button id="connect-ar-btn" class="action-button btn-4 locked">
                     Подключить к AR очкам
-                    <span class="lock-icon">⏳</span>
+                    <span class="lock-icon">⏱️ 26д</span>
                     <div class="lock-message">Доступно после 30 дней обучения</div>
                 </button>
             </div>
@@ -174,22 +208,24 @@
     <script>
         // Скрипт для управления загрузкой
         document.addEventListener('DOMContentLoaded', function() {
+            // Проверка на готовность Telegram WebApp
+            if (window.Telegram && window.Telegram.WebApp) {
+                // Уведомляем Telegram, что приложение готово
+                window.Telegram.WebApp.ready();
+            }
+            
+            // Скрываем индикатор загрузки
             setTimeout(function() {
                 const loadingOverlay = document.getElementById('loading-overlay');
-                loadingOverlay.style.opacity = '0';
-                setTimeout(function() {
-                    loadingOverlay.style.display = 'none';
-                }, 300);
+                if (loadingOverlay) {
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(function() {
+                        loadingOverlay.style.display = 'none';
+                    }, 300);
+                }
             }, 500);
         });
     </script>
-    
-    <style>
-        @keyframes loader-spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
     
     <script src="script.js" defer></script>
 </body>
