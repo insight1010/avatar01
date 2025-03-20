@@ -9,11 +9,10 @@ document.addEventListener('DOMContentLoaded', function() {
         telegramWebApp.disableVerticalSwipes();
     }
     
-    // Установка обработчика для исправления проблем со скроллингом
+    // Использовать passive: true для улучшения производительности скролла
     document.addEventListener('touchmove', function(e) {
-        // Разрешаем нативный скроллинг
-        e.stopPropagation();
-    }, { passive: false });
+        // Эта функция только для предотвращения блокировки скролла
+    }, { passive: true });
     
     // Изменение стилей в соответствии с темой Telegram
     if (telegramWebApp.colorScheme === 'dark') {
@@ -25,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.style.setProperty('--card-bg', '#ffffff');
     }
     
-    // DOM элементы
+    // DOM элементы - получаем все сразу для оптимизации
     const interactBtn = document.getElementById('interact-btn');
     const addBotBtn = document.getElementById('add-bot-btn');
     const connectChatsBtn = document.getElementById('connect-chats-btn');
@@ -43,6 +42,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressFill = document.querySelector('.progress-fill');
     const daysPassed = document.querySelector('.days-passed');
     const connectTelegramBtn = document.getElementById('connect-telegram-btn');
+    
+    // Создаем фоновые элементы только на десктопах (для оптимизации)
+    if (window.innerWidth > 768) {
+        // Ограничиваем количество фоновых элементов для мобильных устройств
+        createDigitalParticles(15); // Меньше частиц
+    }
     
     // Создание пиксельного аватара
     createPixelAvatar(pixelAvatar);
@@ -149,22 +154,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Функция для анимации прогресс-бара
+    // Функция для анимации прогресс-бара - оптимизирована
     function animateProgressBar() {
         const currentDays = parseInt(daysPassed.textContent);
         const totalDays = parseInt(document.querySelector('.days-total').textContent);
         
         const progressPercent = (currentDays / totalDays) * 100;
         
-        // Сначала установим ширину 0
-        progressFill.style.width = '0%';
+        // Устанавливаем ширину напрямую без анимации
+        progressFill.style.width = progressPercent + '%';
         
-        // Затем анимируем до текущего значения
-        setTimeout(() => {
-            progressFill.style.width = progressPercent + '%';
-        }, 500);
-        
-        // Проверяем статус кнопок
+        // Проверяем статус кнопок сразу
         checkButtonsUnlock(currentDays);
     }
     
@@ -299,211 +299,129 @@ document.addEventListener('DOMContentLoaded', function() {
     createDigitalParticles();
 });
 
-// Функция для создания пиксельного аватара
+// Оптимизированная функция создания пиксельного аватара 
 function createPixelAvatar(container) {
-    if (!container) return;
-    
-    // Настройки пиксельной сетки
-    const pixelSize = 3; // Уменьшаем размер для увеличения количества пикселей
-    const gridWidth = Math.floor(container.clientWidth / pixelSize);
-    const gridHeight = Math.floor(container.clientHeight / pixelSize);
-    
     // Очищаем контейнер
     container.innerHTML = '';
     
-    // Цвета для пикселей
-    const colors = [
-        'rgba(0, 255, 255, 0.85)',  // Голубой (ярче)
-        'rgba(70, 140, 255, 0.85)',  // Синий (ярче)
-        'rgba(130, 10, 210, 0.75)',   // Фиолетовый (ярче)
-        'rgba(255, 45, 155, 0.75)',  // Розовый (ярче)
-        'rgba(90, 230, 255, 0.85)'   // Светло-голубой (ярче)
-    ];
+    // Создаем фрагмент для оптимизации отрисовки
+    const fragment = document.createDocumentFragment();
     
-    // Создаем аморфное пятно пикселей
-    const centerX = Math.floor(gridWidth / 2);
-    const centerY = Math.floor(gridHeight / 2);
-    const baseRadius = Math.min(gridWidth, gridHeight) * 0.35;
+    // Размер сетки
+    const gridSize = 12;
     
-    // Создаем пиксели
-    for (let y = 0; y < gridHeight; y++) {
-        for (let x = 0; x < gridWidth; x++) {
-            // Базовое расстояние от центра
-            const baseDist = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+    // Вероятность заполнения пикселей (оптимизировано)
+    const fillProbability = 0.45;
+    
+    // Создаем меньше пикселей для улучшения производительности
+    for (let i = 0; i < gridSize; i++) {
+        for (let j = 0; j < gridSize; j++) {
+            // Пропускаем некоторые пиксели для улучшения производительности
+            if ((i + j) % 2 === 0 && Math.random() > 0.7) continue;
             
-            // Случайные вариации для создания неровных краев
-            const angleRad = Math.atan2(y - centerY, x - centerX);
-            
-            // Создаем переменную для анимации изменения формы
-            const uniqueId = `wave-${x}-${y}`;
-            
-            // Решаем, нужно ли рисовать пиксель в данной позиции
-            if (baseDist < baseRadius) {
-                // Увеличиваем вероятность появления пикселей на 40%
-                const probability = 0.95 - (baseDist / baseRadius) * 0.5;
-                if (Math.random() < probability) {
-                    const pixel = document.createElement('div');
-                    pixel.className = 'avatar-pixel';
-                    pixel.dataset.id = uniqueId;
-                    
-                    // Задаем позицию
-                    pixel.style.width = pixelSize + 'px';
-                    pixel.style.height = pixelSize + 'px';
-                    pixel.style.position = 'absolute';
-                    pixel.style.left = (x * pixelSize) + 'px';
-                    pixel.style.top = (y * pixelSize) + 'px';
-                    
-                    // Случайный цвет из палитры
-                    const colorIndex = Math.floor(Math.random() * colors.length);
-                    pixel.style.backgroundColor = colors[colorIndex];
-                    
-                    // Добавляем прозрачность (больше к краям)
-                    const edgeFactor = 1 - (baseDist / baseRadius) * 0.7;
-                    pixel.style.opacity = (Math.random() * 0.4 + 0.4) * edgeFactor;
-                    
-                    // Добавляем анимацию мерцания и движения
-                    const animDuration = 2 + Math.random() * 5;
-                    const animDelay = Math.random() * 4;
-                    pixel.style.animation = `
-                        pixelPulse ${animDuration}s infinite alternate ${animDelay}s,
-                        pixelWave ${3 + Math.random() * 6}s infinite alternate ${Math.random() * 2}s
-                    `;
-                    
-                    // Устанавливаем трансформацию для каждого пикселя
-                    const distance = 2 + Math.random() * 6;
-                    const angle = Math.random() * 360;
-                    pixel.style.setProperty('--wave-distance', `${distance}px`);
-                    pixel.style.setProperty('--wave-angle', `${angle}deg`);
-                    
-                    container.appendChild(pixel);
-                }
-            } else if (baseDist < baseRadius * 1.3 && Math.random() > 0.8) {
-                // Увеличиваем количество внешних "размытых" пикселей
+            // Создаем только необходимые пиксели
+            if (Math.random() < fillProbability) {
                 const pixel = document.createElement('div');
-                pixel.className = 'avatar-pixel outer-pixel';
+                pixel.className = 'pixel';
                 
-                // Задаем позицию
-                pixel.style.width = pixelSize + 'px';
-                pixel.style.height = pixelSize + 'px';
-                pixel.style.position = 'absolute';
-                pixel.style.left = (x * pixelSize) + 'px';
-                pixel.style.top = (y * pixelSize) + 'px';
+                // Избегаем преобразований, которые вызывают repainting
+                pixel.style.top = `${(i / gridSize) * 100}%`;
+                pixel.style.left = `${(j / gridSize) * 100}%`;
                 
-                // Случайный цвет из палитры
-                const colorIndex = Math.floor(Math.random() * colors.length);
-                pixel.style.backgroundColor = colors[colorIndex];
+                // Оптимизация: уменьшаем количество анимаций
+                if ((i+j) % 4 === 0) {
+                    // Применяем анимацию только к каждому четвертому пикселю
+                    const animDuration = 2 + Math.random() * 2;
+                    const animDelay = Math.random() * 1;
+                    pixel.style.animation = `pixelPulse ${animDuration}s infinite alternate ${animDelay}s`;
+                }
                 
-                // Меньшая непрозрачность для внешних пикселей
-                pixel.style.opacity = Math.random() * 0.4 + 0.1;
-                
-                // Анимация для внешних пикселей
-                const animDuration = 3 + Math.random() * 7;
-                const animDelay = Math.random() * 5;
-                pixel.style.animation = `outerPixelPulse ${animDuration}s infinite alternate ${animDelay}s`;
-                
-                container.appendChild(pixel);
+                fragment.appendChild(pixel);
             }
         }
     }
     
-    // Создаем стиль для анимации пикселей
-    const style = document.createElement('style');
-    style.innerHTML = `
-        @keyframes pixelPulse {
-            0% { opacity: 0.2; transform: scale(0.7); }
-            50% { opacity: 0.6; }
-            100% { opacity: 0.4; transform: scale(1.2); }
-        }
+    // Создаём меньше декоративных элементов 
+    for (let i = 0; i < 4; i++) {
+        const outerPixel = document.createElement('div');
+        outerPixel.className = 'outer-pixel';
         
-        @keyframes outerPixelPulse {
-            0% { opacity: 0.05; transform: scale(0.5) translateY(3px); }
-            50% { opacity: 0.3; }
-            100% { opacity: 0.15; transform: scale(1.1) translateY(-3px); }
-        }
+        // Устанавливаем позицию без лишних вычислений
+        const angle = (i / 4) * 360;
+        const distance = 40 + Math.random() * 20;
         
-        @keyframes pixelWave {
-            0% { transform: translate(calc(cos(var(--wave-angle)) * 0), calc(sin(var(--wave-angle)) * 0)); }
-            33% { transform: translate(calc(cos(var(--wave-angle)) * var(--wave-distance)), calc(sin(var(--wave-angle)) * var(--wave-distance))); }
-            66% { transform: translate(calc(cos(var(--wave-angle) + 120deg) * var(--wave-distance)), calc(sin(var(--wave-angle) + 120deg) * var(--wave-distance))); }
-            100% { transform: translate(calc(cos(var(--wave-angle) + 240deg) * var(--wave-distance)), calc(sin(var(--wave-angle) + 240deg) * var(--wave-distance))); }
-        }
+        outerPixel.style.top = `calc(50% + ${Math.sin(angle * Math.PI / 180) * distance}px)`;
+        outerPixel.style.left = `calc(50% + ${Math.cos(angle * Math.PI / 180) * distance}px)`;
         
-        .avatar-pixel {
-            transition: all 0.5s ease;
-            border-radius: 50%;
-            box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
-        }
+        // Применяем только необходимые стили
+        outerPixel.style.opacity = 0.6 + Math.random() * 0.4;
         
-        .outer-pixel {
-            filter: blur(1.5px);
-        }
+        // Оптимизация: более простая анимация
+        const animDuration = 4 + Math.random() * 2;
+        const animDelay = Math.random() * 2;
+        outerPixel.style.animation = `outerPixelPulse ${animDuration}s infinite alternate ${animDelay}s`;
         
-        .pixel-avatar {
-            animation: blobMovement 20s ease-in-out infinite alternate;
-            filter: blur(0.7px);
-        }
-        
-        @keyframes blobMovement {
-            0% { transform: scale(1) rotate(0deg); }
-            20% { transform: scale(1.02) rotate(5deg); }
-            40% { transform: scale(0.98) rotate(-3deg); }
-            60% { transform: scale(1.03) rotate(-6deg); }
-            80% { transform: scale(0.97) rotate(2deg); }
-            100% { transform: scale(1.01) rotate(7deg); }
-        }
-    `;
-    document.head.appendChild(style);
+        fragment.appendChild(outerPixel);
+    }
     
-    // Запускаем интервал для периодического обновления положения некоторых пикселей
-    setInterval(() => {
-        const pixels = container.querySelectorAll('.avatar-pixel');
-        pixels.forEach(pixel => {
-            if (Math.random() > 0.7) {
-                const distance = 2 + Math.random() * 6;
-                const angle = Math.random() * 360;
-                pixel.style.setProperty('--wave-distance', `${distance}px`);
-                pixel.style.setProperty('--wave-angle', `${angle}deg`);
-            }
-        });
-    }, 3000);
+    // Единоразовое добавление всех элементов
+    container.appendChild(fragment);
 }
 
-function createDigitalParticles() {
-    const container = document.body;
-    const particleCount = 50;
+// Оптимизация анимаций
+// Убираем лишние кадры анимации
+const style = document.createElement('style');
+style.textContent = `
+@keyframes pixelPulse {
+    0% { transform: scale(0.8); opacity: 0.4; }
+    100% { transform: scale(1.2); opacity: 0.8; }
+}
+
+@keyframes outerPixelPulse {
+    0% { transform: scale(0.9); opacity: 0.3; }
+    100% { transform: scale(1.1); opacity: 0.6; }
+}
+`;
+document.head.appendChild(style);
+
+// Оптимизированная функция создания цифровых частиц
+function createDigitalParticles(count = 15) {
+    // Создаем контейнер для частиц, если его еще нет
+    let particlesContainer = document.querySelector('.background-particles');
+    if (!particlesContainer) {
+        particlesContainer = document.createElement('div');
+        particlesContainer.className = 'background-particles';
+        document.body.appendChild(particlesContainer);
+    }
     
-    for (let i = 0; i < particleCount; i++) {
+    // Используем фрагмент для оптимизации DOM-операций
+    const fragment = document.createDocumentFragment();
+    
+    // Создаем меньше частиц
+    for (let i = 0; i < count; i++) {
         const particle = document.createElement('div');
-        particle.classList.add('digital-particle');
+        particle.className = 'bg-particle';
         
-        // Случайное позиционирование
-        particle.style.left = Math.random() * 100 + 'vw';
-        particle.style.top = Math.random() * 100 + 'vh';
-        particle.style.width = (Math.random() * 3 + 1) + 'px';
-        particle.style.height = particle.style.width;
+        // Случайное начальное положение
+        particle.style.top = `${Math.random() * 100}%`;
+        particle.style.left = `${Math.random() * 100}%`;
         
-        // Случайная задержка анимации
-        particle.style.animationDelay = (Math.random() * 10) + 's';
-        particle.style.animationDuration = (Math.random() * 20 + 10) + 's';
+        // Используем translate3d для GPU-ускорения
+        particle.style.transform = `translate3d(0, 0, 0)`;
         
-        container.appendChild(particle);
+        // Случайный размер
+        const size = 2 + Math.random() * 3;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        // Случайная непрозрачность
+        particle.style.opacity = 0.1 + Math.random() * 0.3;
+        
+        fragment.appendChild(particle);
     }
     
-    // Также добавим цифровые элементы
-    const digitalElements = ['0', '1'];
-    for (let i = 0; i < 20; i++) {
-        const element = document.createElement('div');
-        element.classList.add('digital-particle');
-        element.textContent = digitalElements[Math.floor(Math.random() * digitalElements.length)];
-        element.style.fontSize = (Math.random() * 14 + 8) + 'px';
-        element.style.color = 'rgba(0, 255, 255, 0.2)';
-        element.style.left = Math.random() * 100 + 'vw';
-        element.style.top = Math.random() * 100 + 'vh';
-        element.style.animationDelay = (Math.random() * 5) + 's';
-        element.style.animationDuration = (Math.random() * 15 + 10) + 's';
-        
-        container.appendChild(element);
-    }
+    // Добавляем все элементы за одну операцию
+    particlesContainer.appendChild(fragment);
 }
 
 // Функция для открытия Telegram бота
