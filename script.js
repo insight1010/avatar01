@@ -1,10 +1,47 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Инициализация переменных Telegram WebApp
-    const telegramWebApp = window.Telegram.WebApp;
-    telegramWebApp.expand(); // Разворачиваем на весь экран
-    telegramWebApp.ready(); // Сообщаем о готовности приложения
+    // Проверка доступности Telegram WebApp API
+    if (!window.Telegram || !window.Telegram.WebApp) {
+        console.error('Telegram WebApp API не доступен');
+        // Добавим индикатор ошибки в интерфейс для отладки
+        const errorElement = document.createElement('div');
+        errorElement.style.position = 'fixed';
+        errorElement.style.top = '10px';
+        errorElement.style.right = '10px';
+        errorElement.style.padding = '10px';
+        errorElement.style.background = 'rgba(255,0,0,0.7)';
+        errorElement.style.color = 'white';
+        errorElement.style.borderRadius = '5px';
+        errorElement.style.zIndex = '9999';
+        errorElement.textContent = 'Ошибка: TG WebApp не инициализирован';
+        document.body.appendChild(errorElement);
+        
+        // Попытка повторной инициализации через 500мс
+        setTimeout(initApp, 500);
+        return;
+    }
     
-    // Получаем initData Telegram для корректной работы WebApp
+    // Инициализация приложения
+    initApp();
+});
+
+function initApp() {
+    // Telegram WebApp API
+    const telegramWebApp = window.Telegram ? window.Telegram.WebApp : null;
+    
+    if (!telegramWebApp) {
+        console.error('Telegram WebApp API все еще не доступен!');
+        return;
+    }
+    
+    console.log('TG WebApp успешно инициализирован, платформа:', telegramWebApp.platform);
+    
+    // Разворачиваем на весь экран
+    telegramWebApp.expand(); 
+    
+    // Сообщаем о готовности приложения
+    telegramWebApp.ready();
+    
+    // Получаем и обрабатываем параметры инициализации
     const initData = telegramWebApp.initData || '';
     const initDataUnsafe = telegramWebApp.initDataUnsafe || {};
     
@@ -527,21 +564,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Добавляем визуальную обратную связь при нажатии
                 button.addEventListener('touchstart', function(e) {
                     this.classList.add('touch-active');
-                    // Предотвращаем ненужные события
-                    if (!this.classList.contains('locked')) {
-                        // Предотвращаем двойные клики и увеличение интерфейса
-                        e.preventDefault();
-                    }
+                    
+                    // Важно для TMA: всегда используем e.preventDefault для кнопок
+                    // чтобы избежать двойной обработки и задержек
+                    e.preventDefault();
                 }, { passive: false });
                 
-                // Удаляем активное состояние при отпускании
-                button.addEventListener('touchend', function() {
+                // Удаляем активное состояние при отпускании и выполняем клик
+                button.addEventListener('touchend', function(e) {
                     this.classList.remove('touch-active');
-                }, { passive: true });
+                    
+                    // Предотвращаем двойную обработку событий на сенсорных устройствах
+                    e.preventDefault();
+                    
+                    // Добавляем отладочную информацию
+                    console.log('TouchEnd на кнопке:', this.textContent.trim());
+                    
+                    // Симулируем клик, чтобы обработчики событий click работали надежно
+                    if (!this.disabled && !this.classList.contains('processing-click')) {
+                        this.classList.add('processing-click');
+                        
+                        // Ручное выполнение клика
+                        setTimeout(() => {
+                            console.log('Симулируем клик на:', this.textContent.trim());
+                            this.click();
+                            this.classList.remove('processing-click');
+                        }, 10);
+                    }
+                }, { passive: false });
                 
                 // На всякий случай удаляем активное состояние при отмене
                 button.addEventListener('touchcancel', function() {
                     this.classList.remove('touch-active');
+                    this.classList.remove('processing-click');
                 }, { passive: true });
             });
             
@@ -614,15 +669,24 @@ document.addEventListener('DOMContentLoaded', function() {
             const clickableElements = document.querySelectorAll('button, a, .clickable-title');
             clickableElements.forEach(element => {
                 element.addEventListener('click', function(e) {
+                    // Предотвращаем множественные клики в течение 500 мс
                     if (this.dataset.processing === 'true') {
+                        console.log('Предотвращен множественный клик', this);
                         e.preventDefault();
                         e.stopPropagation();
                         return false;
                     }
                     
+                    // Устанавливаем флаг обработки
                     this.dataset.processing = 'true';
+                    
+                    // Добавляем визуальную обратную связь
+                    this.classList.add('click-feedback');
+                    
+                    // Очищаем флаг через 500 мс
                     setTimeout(() => {
                         this.dataset.processing = 'false';
+                        this.classList.remove('click-feedback');
                     }, 500);
                 });
             });
@@ -827,7 +891,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Настраиваем кнопки Telegram
     setupTelegramButtons();
-});
+
+    // Добавляем глобальный обработчик кликов для отладки
+    document.addEventListener('click', function(e) {
+        if (e.target.tagName === 'BUTTON' || e.target.classList.contains('clickable-title')) {
+            console.log('Клик обработан на:', e.target.textContent.trim(), 
+                        'Классы:', e.target.className,
+                        'Заблокирован:', e.target.classList.contains('locked'));
+        }
+    }, { passive: true });
+}
 
 // Функция для создания пиксельного аватара с плавными анимациями
 function createPixelAvatar(container) {
