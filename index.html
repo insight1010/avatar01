@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Живой Аватар | Ваша цифровая память</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Живой аватар</h1>
+        </header>
+        
+        <div class="avatar-container">
+            <div id="pixel-avatar" class="pixel-avatar"></div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 13%;"></div>
+                </div>
+                <div class="progress-info">
+                    <span class="days-passed">0</span> из <span class="days-total">30</span> дней
+                </div>
+            </div>
+        </div>
+        
+        <main>
+            <div class="info-container">
+                <h2 id="digital-self-title" class="clickable-title">Ваше цифровое Я скоро родится</h2>
+            </div>
+            
+            <div class="action-container">
+                <button id="interact-btn" class="action-button btn-1">Поделиться данными о себе</button>
+                <button id="add-bot-btn" class="action-button btn-2 locked">
+                    Добавить бот в чаты
+                    <div class="lock-message">Доступно после 7 дней обучения</div>
+                </button>
+                <button id="connect-chats-btn" class="action-button btn-3 locked">
+                    Подключить к записям разговоров
+                    <div class="lock-message">Доступно после 14 дней обучения</div>
+                </button>
+                <button id="connect-ar-btn" class="action-button btn-4 locked">
+                    Подключить к AR очкам
+                    <div class="lock-message">Доступно после 30 дней обучения</div>
+                </button>
+            </div>
+        </main>
+        
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2>Взаимодействие с аватаром</h2>
+                <div class="input-area">
+                    <textarea id="user-input" placeholder="Введите API Агента"></textarea>
+                    <button id="submit-input" class="action-button btn-1">Отправить</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="info-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn info-close-btn">&times;</span>
+                <h2>Ваше Цифровое я</h2>
+                <div class="info-details">
+                    <p>Каждый день делитесь информацией о себе, и через 30 дней ваш цифровой помощник:</p>
+                    <ul>
+                        <li>Будет понимать ваш стиль общения</li>
+                        <li>Запомнит важные факты о вас</li>
+                        <li>Структурирует информацию о ваших предпочтениях</li>
+                        <li>Начнет копировать ваше поведение</li>
+                    </ul>
+                    <p class="additional-info">
+                        Ваше Цифровое я - это уникальная технология, которая изучает вашу личность, 
+                        предпочтения и стиль коммуникации. Чем больше информации вы предоставите,
+                        тем точнее будет ваша цифровая копия.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
