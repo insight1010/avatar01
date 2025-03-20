@@ -407,10 +407,6 @@ function initApp() {
     infoCloseBtn.addEventListener('click', closeInfoModal);
     botCloseBtn.addEventListener('click', closeBotModal);
     
-    // Добавляем обработчик для новой кнопки бота
-    const telegramBotBtn = document.getElementById('telegram-bot-btn');
-    telegramBotBtn.addEventListener('click', openBotModal);
-    
     // Обработчик для кнопок с блокировкой - универсальная функция
     function handleLockedButton(e) {
         if (this.classList.contains('locked')) {

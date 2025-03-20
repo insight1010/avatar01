@@ -1024,23 +1024,12 @@ h1 {
     margin-left: -5px;
 }
 
-/* Новая кнопка для бота с эффектом свечения */
-.btn-glow {
-    animation: none;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.btn-glow:hover {
-    animation: btnGlow 2s infinite alternate;
-}
-
-@keyframes btnGlow {
-    0% {
-        box-shadow: 0 0 10px rgba(0, 210, 255, 0.6);
-    }
-    100% {
-        box-shadow: 0 0 20px rgba(0, 210, 255, 0.8), 0 0 30px rgba(130, 10, 210, 0.4);
-    }
+/* Стили для чата в Telegram */
+.tg-chat {
+    margin-top: 30px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 /* Стили для модального окна бота */
@@ -1237,4 +1226,12 @@ h1 {
     transform: scale(0.97);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+/* Стили для чата в Telegram */
+.tg-chat {
+    margin-top: 30px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 } 
