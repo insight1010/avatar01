@@ -242,11 +242,18 @@ document.addEventListener('DOMContentLoaded', function() {
     addBotBtn.addEventListener('click', function(e) {
         if (this.classList.contains('locked')) {
             e.stopPropagation();
-            telegramWebApp.showPopup({
-                title: 'Функция заблокирована',
-                message: 'Эта функция будет доступна после 7 дней обучения вашего цифрового я.',
-                buttons: [{type: 'ok'}]
-            });
+            // Вместо показа popup, просто подсвечиваем сообщение о блокировке
+            const lockMessage = this.querySelector('.lock-message');
+            lockMessage.style.opacity = '1';
+            lockMessage.style.visibility = 'visible';
+            lockMessage.style.transform = 'translateY(0)';
+            
+            // Скрываем сообщение через 3 секунды
+            setTimeout(() => {
+                lockMessage.style.opacity = '0';
+                lockMessage.style.visibility = 'hidden';
+                lockMessage.style.transform = 'translateY(-10px)';
+            }, 3000);
             return;
         }
         
@@ -260,11 +267,18 @@ document.addEventListener('DOMContentLoaded', function() {
     connectChatsBtn.addEventListener('click', function(e) {
         if (this.classList.contains('locked')) {
             e.stopPropagation();
-            telegramWebApp.showPopup({
-                title: 'Функция заблокирована',
-                message: 'Эта функция будет доступна после 14 дней обучения вашего цифрового я.',
-                buttons: [{type: 'ok'}]
-            });
+            // Вместо показа popup, просто подсвечиваем сообщение о блокировке
+            const lockMessage = this.querySelector('.lock-message');
+            lockMessage.style.opacity = '1';
+            lockMessage.style.visibility = 'visible';
+            lockMessage.style.transform = 'translateY(0)';
+            
+            // Скрываем сообщение через 3 секунды
+            setTimeout(() => {
+                lockMessage.style.opacity = '0';
+                lockMessage.style.visibility = 'hidden';
+                lockMessage.style.transform = 'translateY(-10px)';
+            }, 3000);
             return;
         }
         
@@ -278,11 +292,18 @@ document.addEventListener('DOMContentLoaded', function() {
     connectArBtn.addEventListener('click', function(e) {
         if (this.classList.contains('locked')) {
             e.stopPropagation();
-            telegramWebApp.showPopup({
-                title: 'Функция заблокирована',
-                message: 'Эта функция будет доступна после 30 дней обучения вашего цифрового я.',
-                buttons: [{type: 'ok'}]
-            });
+            // Вместо показа popup, просто подсвечиваем сообщение о блокировке
+            const lockMessage = this.querySelector('.lock-message');
+            lockMessage.style.opacity = '1';
+            lockMessage.style.visibility = 'visible';
+            lockMessage.style.transform = 'translateY(0)';
+            
+            // Скрываем сообщение через 3 секунды
+            setTimeout(() => {
+                lockMessage.style.opacity = '0';
+                lockMessage.style.visibility = 'hidden';
+                lockMessage.style.transform = 'translateY(-10px)';
+            }, 3000);
             return;
         }
         

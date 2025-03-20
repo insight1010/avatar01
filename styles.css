@@ -383,29 +383,29 @@ h1 {
 }
 
 .lock-message {
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 0.8rem 1rem;
-    border-radius: 8px;
     position: absolute;
-    top: -70px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: max-content;
-    max-width: 250px;
-    text-align: center;
-    z-index: 100;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    bottom: -40px;
+    left: 0;
+    width: 100%;
+    background: rgba(16, 30, 40, 0.9);
+    color: white;
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    z-index: 10;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-10px);
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    font-size: 0.9rem;
+    border: 1px solid rgba(0, 210, 255, 0.15);
+    text-align: center;
 }
 
-.action-button.locked:hover .lock-message {
+.locked:hover .lock-message {
+    transform: translateY(0);
     opacity: 1;
     visibility: visible;
-    top: -60px;
 }
 
 .btn-1 {
@@ -611,6 +611,17 @@ h1 {
     .progress-info {
         font-size: 0.8rem;
         margin-top: 6px;
+    }
+    
+    .lock-message {
+        bottom: -30px;
+        padding: 0.3rem;
+        font-size: 0.75rem;
+    }
+    
+    .lock-icon {
+        right: 5px;
+        font-size: 0.9rem;
     }
 }
 
@@ -929,4 +940,47 @@ h1 {
 
 .telegram-btn:active {
     transform: translateY(0);
+}
+
+/* Заблокированные кнопки */
+.locked {
+    opacity: 0.7;
+    cursor: not-allowed;
+    position: relative;
+    overflow: visible;
+}
+
+.lock-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+.lock-message {
+    position: absolute;
+    bottom: -40px;
+    left: 0;
+    width: 100%;
+    background: rgba(16, 30, 40, 0.9);
+    color: white;
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    z-index: 10;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-10px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 210, 255, 0.15);
+    text-align: center;
+}
+
+.locked:hover .lock-message {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
 } 
