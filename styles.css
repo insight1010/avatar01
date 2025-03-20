@@ -1,23 +1,25 @@
 :root {
-    --bg-color: #10002b;
-    --text-color: #ffffff;
-    --card-bg: #240046;
-    --primary-color: #6a00f4;
-    --secondary-color: #19A1F1;
+    --primary-color: #7209b7;
+    --secondary-color: #4361ee;
     --accent-color: #4cc9f0;
     --neon-pink: #f72585;
     --neon-purple: #b5179e;
     --neon-blue: #3a0ca3;
+    --bg-color: #10002b;
+    --text-color: #ffffff;
     --border-radius: 16px;
+    --card-bg: #240046;
     --button-gradient1: linear-gradient(45deg, #f72585, #7209b7);
     --button-gradient2: linear-gradient(45deg, #3a0ca3, #4361ee);
+    --button-gradient3: linear-gradient(45deg, #4361ee, #4cc9f0);
+    --button-gradient4: linear-gradient(45deg, #7209b7, #f72585);
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', 'Roboto', sans-serif;
 }
 
 html, body {
@@ -28,19 +30,17 @@ html, body {
 }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
     min-height: 100vh;
-    overflow-x: hidden;
-    font-size: 16px;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
     position: relative;
+    overflow: auto; /* Разрешаем скролл */
     -webkit-overflow-scrolling: touch; /* Улучшает инерционный скролл на iOS */
 }
 
-/* Добавляем стильную сетку на фон */
 body::before {
     content: '';
     position: absolute;
@@ -51,7 +51,6 @@ body::before {
     background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect x="0" y="0" width="100" height="100" fill="none"/><path d="M0,50 L100,50" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/><path d="M50,0 L50,100" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></svg>');
     opacity: 0.3;
     z-index: -1;
-    pointer-events: none;
 }
 
 @keyframes floatingParticles {
@@ -68,50 +67,84 @@ body::before {
     }
 }
 
-/* Базовый контейнер */
 .container {
     position: relative;
     z-index: 1;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 1rem;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    background-color: var(--bg-color);
+    padding: 20px;
+    overflow-y: auto; /* Разрешаем скролл внутри контейнера */
+    height: 100%;
+    -webkit-overflow-scrolling: touch;
 }
 
-/* Заголовок */
+.container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(circle at center, rgba(0,150,255,0.1) 0%, transparent 70%);
+    z-index: -1;
+}
+
+/* Добавляем анимированные частицы */
+.digital-particle {
+    position: fixed;
+    background: rgba(255, 255, 255, 0.3);
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    box-shadow: 0 0 10px 2px rgba(0, 200, 255, 0.3);
+    animation: floatingParticles 15s infinite linear;
+    z-index: -1;
+}
+
 header {
     text-align: center;
-    padding: 1rem 0;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    position: relative;
 }
 
-header h1 {
-    font-size: 2.4rem;
-    font-weight: 600;
+h1 {
+    font-size: 2.5rem;
+    margin: 1rem 0;
+    text-align: center;
     background: linear-gradient(45deg, #00d2ff, #3a7bd5);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin: 0.8rem 0;
     text-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
 }
 
-/* Стили для пиксельного аватара */
-.pixel-avatar {
-    width: 150px;
-    height: 150px;
-    background: var(--card-bg);
-    border-radius: 50%;
+.avatar-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+    height: auto;
+    min-height: 210px;
     position: relative;
-    overflow: hidden;
-    box-shadow: 0 0 30px rgba(106, 0, 244, 0.4);
-    will-change: transform;
+    z-index: 1;
 }
 
-/* Эффект свечения для аватара */
+.pixel-avatar {
+    width: 140px;
+    height: 140px;
+    position: relative;
+    border-radius: 0;
+    overflow: visible;
+    margin-bottom: 15px;
+}
+
+@keyframes pixelFloat {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-5px) rotate(2deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
+
 .pixel-avatar::before {
     content: '';
     position: absolute;
@@ -121,9 +154,7 @@ header h1 {
     width: 100%;
     height: 100%;
     background: radial-gradient(circle at center, rgba(0, 210, 255, 0.2), transparent 70%);
-    filter: blur(8px);
-    z-index: 0;
-    will-change: opacity;
+    filter: blur(15px);
     animation: pulseGlow 4s infinite alternate;
 }
 
@@ -132,40 +163,12 @@ header h1 {
     100% { opacity: 0.8; width: 120%; height: 120%; }
 }
 
-/* Оптимизированные стили для пикселей */
-.pixel, .outer-pixel {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #6a00f4;
-    box-shadow: 0 0 5px rgba(106, 0, 244, 0.3);
-    will-change: transform, opacity;
-}
-
-.pixel {
-    background: rgba(70, 140, 255, 0.85);
-}
-
-.outer-pixel {
-    background: rgba(0, 255, 255, 0.85);
-    filter: blur(1px);
-}
-
-/* Контейнер для аватара и прогресс-бара */
-.avatar-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    margin: 2rem auto;
-    position: relative;
-}
-
-/* Прогресс бар */
 .progress-container {
-    width: 200px;
-    margin-top: 1.5rem;
+    width: 80%;
+    max-width: 280px;
+    margin-top: 10px;
+    position: relative;
+    z-index: 2;
 }
 
 .progress-bar {
@@ -177,34 +180,64 @@ header h1 {
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(5px);
     border: 1px solid rgba(0, 210, 255, 0.15);
-    margin-bottom: 0.5rem;
 }
 
 .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, #00d2ff, #3a7bd5);
     border-radius: 10px;
-    width: 13%;
-    transition: width 0.8s ease;
-    box-shadow: 0 0 10px rgba(0, 210, 255, 0.4);
+    position: relative;
+    transition: width 1s ease;
+    box-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 5px;
+    background: rgba(255, 255, 255, 0.8);
+    animation: progressPulse 1.5s infinite;
+}
+
+@keyframes progressPulse {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.3; }
 }
 
 .progress-info {
-    font-size: 0.8rem;
+    text-align: center;
+    margin-top: 8px;
+    font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.9);
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* Информационный контейнер */
+.days-passed {
+    color: #00d2ff;
+    font-weight: 600;
+}
+
+.days-total {
+    color: #00d2ff;
+    font-weight: 600;
+}
+
 .info-container {
     background: rgba(16, 30, 40, 0.7);
     border-radius: 12px;
     padding: 1.5rem;
-    margin: 2rem 0;
-    backdrop-filter: blur(5px);
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(0, 210, 255, 0.15);
     text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: relative;
     overflow: hidden;
 }
@@ -218,18 +251,21 @@ header h1 {
     bottom: 0;
     background: radial-gradient(circle at center, rgba(0, 150, 255, 0.08) 0%, transparent 70%);
     z-index: 0;
-    pointer-events: none;
 }
 
 .info-container h2 {
-    margin-bottom: 0.5rem;
     font-size: 1.8rem;
-    font-weight: 600;
-    line-height: 1.3;
+    margin: 0;
     color: #00d2ff;
-    text-shadow: 0 0 10px rgba(0, 210, 255, 0.4);
+    text-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
     position: relative;
     z-index: 1;
+    background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
 }
 
 .clickable-title {
@@ -237,33 +273,75 @@ header h1 {
     position: relative;
     display: inline-block;
     transition: all 0.3s ease;
+    padding-right: 30px;
 }
 
 .clickable-title:hover {
     transform: translateY(-2px);
+    text-shadow: 0 0 20px rgba(0, 210, 255, 0.7);
 }
 
-/* Стили для кнопок действий */
+.clickable-title::after {
+    content: 'ℹ️';
+    font-size: 1rem;
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.clickable-title:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.2);
+    right: -5px;
+}
+
+.info-container p {
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    font-size: 1.1rem;
+}
+
+.info-container ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.info-container li {
+    margin-bottom: 0.8rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.info-container li:before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: #00d2ff;
+    font-weight: bold;
+}
+
 .action-container {
-    display: flex;
-    flex-direction: column;
+    display: grid;
     gap: 1rem;
-    margin-top: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
 .action-button {
-    padding: 1rem;
-    border-radius: 10px;
+    padding: 1rem 1.5rem;
     border: none;
-    color: white;
-    font-weight: 600;
+    border-radius: 8px;
     font-size: 1rem;
+    font-weight: 500;
     cursor: pointer;
-    position: relative;
     transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    color: white;
+    position: relative;
     overflow: hidden;
     z-index: 1;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .action-button:before {
@@ -282,31 +360,52 @@ header h1 {
     left: 100%;
 }
 
-/* Новая кнопка для бота с эффектом свечения */
-.btn-glow {
-    background: linear-gradient(45deg, #240046, #3c096c);
-    border: 2px solid #6a00f4;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(106, 0, 244, 0.3);
+.action-button.locked {
+    cursor: not-allowed;
+    filter: grayscale(0.5);
+    opacity: 0.8;
 }
 
-.btn-glow::after {
-    content: '';
+.action-button.locked::after {
+    content: '🔒';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: rgba(106, 0, 244, 0.2);
-    transform: rotate(30deg);
-    animation: glowEffect 3s infinite;
+    top: 10px;
+    right: 10px;
+    font-size: 1.2rem;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+    animation: lockPulse 2s infinite;
 }
 
-@keyframes glowEffect {
-    0% { opacity: 0; transform: translate(-50%, -50%) rotate(30deg); }
-    20% { opacity: 0.5; }
-    100% { opacity: 0; transform: translate(50%, 50%) rotate(30deg); }
+@keyframes lockPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.lock-message {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    position: absolute;
+    top: -70px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 250px;
+    text-align: center;
+    z-index: 100;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.action-button.locked:hover .lock-message {
+    opacity: 1;
+    visibility: visible;
+    top: -60px;
 }
 
 .btn-1 {
@@ -329,42 +428,6 @@ header h1 {
     box-shadow: 0 4px 15px rgba(249, 212, 35, 0.3);
 }
 
-.action-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.action-button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Заблокированные кнопки */
-.locked {
-    opacity: 0.7;
-    cursor: not-allowed;
-    position: relative;
-    overflow: hidden;
-}
-
-.lock-message {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 0.3rem 0;
-    font-size: 0.7rem;
-    color: white;
-    transform: translateY(100%);
-    transition: all 0.3s ease;
-}
-
-.locked:hover .lock-message {
-    transform: translateY(0);
-}
-
-/* Стили для модальных окон */
 .modal {
     display: none;
     position: fixed;
@@ -372,12 +435,11 @@ header h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 100;
+    background: rgba(10, 20, 30, 0.8);
     justify-content: center;
     align-items: center;
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
+    z-index: 1000;
+    backdrop-filter: blur(8px);
 }
 
 .modal-content {
@@ -402,7 +464,6 @@ header h1 {
     height: 200%;
     background: radial-gradient(circle at center, rgba(0, 150, 255, 0.05) 0%, transparent 60%);
     z-index: -1;
-    pointer-events: none;
 }
 
 .modal-content h2 {
@@ -417,8 +478,14 @@ header h1 {
 }
 
 @keyframes modal-appear {
-    0% { opacity: 0; transform: scale(0.9); }
-    100% { opacity: 1; transform: scale(1); }
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .close-btn {
@@ -436,7 +503,6 @@ header h1 {
     justify-content: center;
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.2);
-    z-index: 5;
 }
 
 .close-btn:hover {
@@ -445,47 +511,327 @@ header h1 {
     transform: rotate(90deg);
 }
 
-/* Стили для деталей информации */
+.input-area {
+    margin-top: 1.5rem;
+}
+
+#user-input {
+    width: 100%;
+    height: 150px;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    resize: none;
+    margin-bottom: 1rem;
+    box-sizing: border-box;
+}
+
+#user-input:focus {
+    outline: none;
+    border-color: #00d2ff;
+    box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+    .action-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-container, .modal-content {
+        padding: 1.2rem;
+    }
+    
+    .info-container h2 {
+        font-size: 1.6rem;
+        line-height: 1.3;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 2rem;
+        margin: 0.5rem 0;
+    }
+    
+    .avatar-container {
+        margin-bottom: 1.5rem;
+        min-height: 190px;
+    }
+}
+
+@media (max-width: 480px) {
+    .info-container h2 {
+        font-size: 1.5rem;
+    }
+    
+    .action-button {
+        padding: 0.8rem 1.2rem;
+    }
+    
+    .pixel-avatar {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .progress-container {
+        margin-top: 5px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .clickable-title {
+        padding-right: 20px;
+    }
+    
+    .clickable-title::after {
+        font-size: 0.8rem;
+        right: -3px;
+    }
+    
+    .terminal-window {
+        width: 95%;
+    }
+    
+    .terminal-body {
+        padding: 15px;
+    }
+    
+    .modal {
+        align-items: flex-start;
+        padding-top: 20px;
+    }
+    
+    .progress-info {
+        font-size: 0.8rem;
+        margin-top: 6px;
+    }
+}
+
 .info-details {
-    text-align: left;
-    margin-top: 1rem;
-    position: relative;
-    z-index: 1;
+    margin-top: 1.5rem;
 }
 
 .info-details p {
-    margin-bottom: 1rem;
     line-height: 1.6;
+    margin-bottom: 1rem;
     color: rgba(255, 255, 255, 0.9);
 }
 
 .info-details ul {
-    padding-left: 1.5rem;
-    margin-bottom: 1rem;
+    list-style-type: none;
+    padding-left: 0;
+    margin: 1.5rem 0;
 }
 
 .info-details li {
-    margin-bottom: 0.5rem;
+    margin-bottom: 1.2rem;
+    padding-left: 2.5rem;
+    position: relative;
+    line-height: 1.5;
+}
+
+.info-details li:before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #00d2ff;
+    font-weight: bold;
+    background: rgba(0, 210, 255, 0.15);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.additional-info {
+    background: rgba(0, 40, 60, 0.4);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+    border-left: 3px solid #00d2ff;
+    line-height: 1.6;
+}
+
+/* Стили для терминала */
+.terminal-window {
+    width: 90%;
+    max-width: 600px;
+    background: rgba(10, 17, 25, 0.95);
+    border-radius: 8px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+    border: 1px solid rgba(0, 210, 255, 0.3);
+    animation: modal-appear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
 }
 
-.info-details li::before {
-    content: '✓';
-    position: absolute;
-    left: -1.5rem;
-    color: #00d2ff;
+.terminal-header {
+    background: linear-gradient(90deg, #0a111a, #1a2c38);
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 210, 255, 0.3);
+}
+
+.terminal-title {
+    color: rgba(0, 210, 255, 0.9);
+    font-size: 0.9rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.terminal-body {
+    padding: 20px;
+    color: #c5e1f0;
+}
+
+.terminal-output {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.system-msg {
+    color: #7ebed1;
+    margin: 5px 0;
+}
+
+.status-online {
+    color: #38ef7d;
     font-weight: bold;
 }
 
-.info-details .additional-info {
-    font-style: italic;
-    opacity: 0.8;
+.command-msg {
+    color: #00d2ff;
+    margin: 5px 0;
+}
+
+.terminal-input-line {
+    display: flex;
+    margin-bottom: 15px;
+    align-items: flex-start;
+}
+
+.prompt {
+    color: #00d2ff;
+    margin-right: 10px;
+    font-weight: bold;
+    padding-top: 10px;
+}
+
+.terminal-window #user-input {
+    flex: 1;
+    background: rgba(10, 20, 30, 0.5);
+    border: 1px solid rgba(0, 210, 255, 0.2);
+    padding: 10px;
+    color: #c5e1f0;
+    font-family: 'Courier New', monospace;
     font-size: 0.9rem;
-    margin-top: 1.5rem;
-    background: rgba(0, 40, 60, 0.4);
-    padding: 1rem;
-    border-radius: 8px;
-    border-left: 3px solid #00d2ff;
+    resize: none;
+    height: 80px;
+    border-radius: 0;
+    margin-bottom: 0;
+}
+
+.terminal-window #user-input:focus {
+    outline: none;
+    border-color: #00d2ff;
+    box-shadow: 0 0 8px rgba(0, 210, 255, 0.3);
+}
+
+.terminal-btn {
+    background: linear-gradient(90deg, #00556f, #0089a7);
+    border: none;
+    padding: 10px 20px;
+    color: #c5e1f0;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+    width: 100%;
+    border-radius: 3px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.terminal-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: all 0.5s;
+}
+
+.terminal-btn:hover::before {
+    left: 100%;
+}
+
+.terminal-btn:hover {
+    background: linear-gradient(90deg, #0089a7, #00aace);
+    box-shadow: 0 5px 15px rgba(0, 137, 167, 0.3);
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.terminal-input-line::after {
+    content: '|';
+    color: #00d2ff;
+    animation: blink 1s infinite;
+    margin-left: -5px;
+}
+
+/* Новая кнопка для бота с эффектом свечения */
+.btn-glow {
+    background: linear-gradient(45deg, #240046, #3c096c);
+    border: 2px solid #6a00f4;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-glow::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(106, 0, 244, 0.2);
+    transform: rotate(30deg);
+    animation: glowEffect 3s infinite;
+}
+
+@keyframes glowEffect {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) rotate(30deg);
+    }
+    20% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(50%, 50%) rotate(30deg);
+    }
 }
 
 /* Стили для модального окна бота */
@@ -583,212 +929,4 @@ header h1 {
 
 .telegram-btn:active {
     transform: translateY(0);
-}
-
-/* Оптимизируем частицы - ограничиваем их количество */
-.background-particles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    z-index: -1;
-    pointer-events: none;
-}
-
-.bg-particle {
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    border-radius: 50%;
-    background: rgba(106, 0, 244, 0.3);
-    pointer-events: none;
-    box-shadow: 0 0 5px rgba(0, 200, 255, 0.3);
-    will-change: transform;
-}
-
-/* Стили для терминала */
-.terminal-window {
-    width: 100%;
-    background: rgba(10, 17, 25, 0.95);
-    border-radius: 8px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
-    overflow: hidden;
-    font-family: 'Courier New', monospace;
-    border: 1px solid rgba(0, 210, 255, 0.3);
-    animation: modal-appear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    position: relative;
-}
-
-.terminal-header {
-    background: linear-gradient(90deg, #0a111a, #1a2c38);
-    padding: 10px 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(0, 210, 255, 0.3);
-}
-
-.terminal-title {
-    color: rgba(0, 210, 255, 0.9);
-    font-size: 0.9rem;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-
-.terminal-body {
-    padding: 20px;
-    color: #c5e1f0;
-    height: 350px;
-    max-height: 60vh;
-    display: flex;
-    flex-direction: column;
-}
-
-.terminal-output {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-    line-height: 1.5;
-}
-
-.system-msg {
-    color: #7ebed1;
-    margin-bottom: 0.5rem;
-}
-
-.status-online {
-    color: #38ef7d;
-    font-weight: bold;
-}
-
-.command-msg {
-    color: #00d2ff;
-    margin-bottom: 0.5rem;
-}
-
-.terminal-input-line {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 0.5rem;
-}
-
-.prompt {
-    color: #00d2ff;
-    margin-right: 0.5rem;
-    padding-top: 0.3rem;
-    font-weight: bold;
-}
-
-#user-input {
-    flex: 1;
-    background: rgba(10, 20, 30, 0.5);
-    border: 1px solid rgba(0, 210, 255, 0.2);
-    padding: 10px;
-    color: #c5e1f0;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    resize: none;
-    height: 2.5rem;
-    outline: none;
-}
-
-#user-input:focus {
-    outline: none;
-    border-color: #00d2ff;
-    box-shadow: 0 0 8px rgba(0, 210, 255, 0.3);
-}
-
-.terminal-btn {
-    background: linear-gradient(90deg, #00556f, #0089a7);
-    border: none;
-    padding: 0.5rem 1rem;
-    color: #c5e1f0;
-    font-family: 'Courier New', monospace;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    letter-spacing: 1px;
-    border-radius: 3px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-    position: relative;
-    overflow: hidden;
-    margin-top: 0.5rem;
-    align-self: flex-end;
-}
-
-.terminal-btn:hover {
-    background: linear-gradient(90deg, #0089a7, #00aace);
-    box-shadow: 0 5px 15px rgba(0, 137, 167, 0.3);
-}
-
-.terminal-btn:active {
-    transform: translateY(1px);
-}
-
-/* Медиа-запросы для адаптивности */
-@media (max-width: 768px) {
-    .action-button {
-        padding: 0.8rem;
-        font-size: 0.9rem;
-    }
-    
-    .info-container h2 {
-        font-size: 1.6rem;
-    }
-    
-    .modal-content, .terminal-window {
-        width: 95%;
-        padding: 1.5rem;
-    }
-    
-    .terminal-body {
-        height: 300px;
-        padding: 15px;
-    }
-    
-    header h1 {
-        font-size: 2rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .info-container {
-        padding: 1.2rem;
-        margin: 1.5rem 0;
-    }
-    
-    .info-container h2 {
-        font-size: 1.4rem;
-    }
-    
-    .pixel-avatar {
-        width: 120px;
-        height: 120px;
-    }
-    
-    .progress-container {
-        width: 180px;
-    }
-    
-    .action-button {
-        padding: 0.7rem;
-        font-size: 0.85rem;
-    }
-    
-    .terminal-body {
-        height: 250px;
-        padding: 12px;
-    }
-    
-    .modal-content {
-        padding: 1.2rem;
-    }
-    
-    header h1 {
-        font-size: 1.8rem;
-    }
 } 
