@@ -763,42 +763,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Настраиваем кнопки Telegram WebApp
     function setupTelegramButtons() {
-        // Настройка MainButton, если она доступна
+        // Скрываем MainButton, так как у нас уже есть собственная кнопка на странице
         if (telegramWebApp.MainButton) {
-            // При открытии любого модального окна скрываем MainButton
-            const showMainButton = () => {
-                telegramWebApp.MainButton.setText('Активировать бота');
-                telegramWebApp.MainButton.show();
-                telegramWebApp.MainButton.onClick(() => {
-                    openBotModal();
-                });
-            };
-            
-            showMainButton();
-            
-            // Обработчики для скрытия/показа MainButton при открытии/закрытии модальных окон
-            botModal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeBotModal();
-                    showMainButton();
-                }
-            });
-            
-            infoModal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeInfoModal();
-                    showMainButton();
-                }
-            });
-            
-            // Скрываем MainButton при открытии модальных окон
-            telegramBotBtn.addEventListener('click', function() {
-                telegramWebApp.MainButton.hide();
-            });
-            
-            digitalSelfTitle.addEventListener('click', function() {
-                telegramWebApp.MainButton.hide();
-            });
+            telegramWebApp.MainButton.hide();
         }
         
         // Настройка BackButton, если она доступна
@@ -826,10 +793,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                     const anyModalOpen = modalWindows.some(m => m.style.display === 'flex');
                                     if (!anyModalOpen) {
                                         telegramWebApp.BackButton.hide();
-                                        // Показываем MainButton, если нет открытых модальных окон
-                                        if (telegramWebApp.MainButton) {
-                                            showMainButton();
-                                        }
                                     }
                                 });
                             } else {
