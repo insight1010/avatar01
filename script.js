@@ -507,11 +507,11 @@ function createDigitalParticles() {
 // Функция для открытия Telegram бота
 function openTelegramBot() {
     // Открываем ссылку на бота
-    window.open("https://t.me/mamayadoma_bot", "_blank");
+    window.open("https://t.me/vamagiyabot", "_blank");
     
     // Альтернативный способ через API Telegram
     try {
-        telegramWebApp.openTelegramLink("https://t.me/mamayadoma_bot");
+        telegramWebApp.openTelegramLink("https://t.me/vamagiyabot");
     } catch (e) {
         console.log("Ошибка открытия ссылки через Telegram API:", e);
     }
