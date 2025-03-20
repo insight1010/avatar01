@@ -601,9 +601,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }, { passive: true });
         }
     }
+
+    // Обеспечиваем корректную работу всех крестиков в модальных окнах
+    document.querySelectorAll('.close-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Определяем, какое модальное окно нужно закрыть
+            const parentModal = this.closest('.modal');
+            if (parentModal) {
+                parentModal.style.display = 'none';
+            }
+        });
+    });
 });
 
-// Функция для создания пиксельного аватара в виде аморфной переливающейся фигуры типа Siri
+// Функция для создания пиксельного аватара с плавными анимациями
 function createPixelAvatar(container) {
     if (!container) return;
     
@@ -616,315 +627,179 @@ function createPixelAvatar(container) {
     // Определяем, работаем ли мы на мобильном устройстве
     const isMobile = window.innerWidth < 768;
     
-    // Настройки пиксельной сетки - ЗНАЧИТЕЛЬНО уменьшаем количество для мобильных
-    const gridSize = isMobile ? 40 : 80; // Меньше точек на мобильных
+    // Настройки пиксельной сетки
+    const gridSize = isMobile ? 40 : 60; // Адаптивное количество точек
     
-    // Цвета для пикселей - используем градиенты голубого, синего и фиолетового
+    // Цветовая палитра - голубой и синий
     const colors = [
-        'rgba(0, 210, 255, 0.85)',  // Голубой (ярче)
-        'rgba(70, 140, 255, 0.85)',  // Синий (ярче)
-        'rgba(130, 10, 210, 0.75)',  // Фиолетовый (ярче)
-        'rgba(90, 230, 255, 0.85)',  // Светло-голубой (ярче)
+        'rgba(0, 210, 255, 0.85)',  // Голубой
+        'rgba(0, 180, 230, 0.85)',  // Светло-синий
+        'rgba(70, 140, 255, 0.85)',  // Синий
     ];
     
     // Размер контейнера
     const containerRect = container.getBoundingClientRect();
     const containerSize = Math.min(containerRect.width, containerRect.height);
-    const pixelSize = containerSize / gridSize; // Очень маленькие пиксели
+    const pixelSize = containerSize / gridSize;
     
     // Центр изображения
     const centerX = gridSize / 2;
     const centerY = gridSize / 2;
     
-    // Текущее время для анимации
-    const startTime = Date.now();
+    // Создаем частицы вокруг центра
+    const totalPoints = isMobile ? 150 : 300; // Количество точек
     
-    // Ограничим количество точек для меньшей нагрузки на мобильных
-    const totalPoints = isMobile ? 400 : 1600;
+    // Генерируем точки в форме круга с небольшим смещением
+    for (let i = 0; i < totalPoints; i++) {
+        // Меняем диапазон расстояния от центра - размещаем частицы ближе к шару
+        // Теперь от 45% до 75% от радиуса вместо 10-50%
+        const distanceFromCenter = Math.random() * 0.3 + 0.45;
+        
+        // Случайный угол
+        const angle = Math.random() * Math.PI * 2;
+        
+        // Вычисляем координаты с небольшим смещением
+        const radius = gridSize * 0.3; // Базовый радиус
+        const x = centerX + Math.cos(angle) * radius * distanceFromCenter;
+        const y = centerY + Math.sin(angle) * radius * distanceFromCenter;
+        
+        // Создаем элемент пикселя
+        const pixelElement = document.createElement('div');
+        
+        // Общие свойства
+        pixelElement.style.position = 'absolute';
+        pixelElement.style.width = pixelSize + 'px';
+        pixelElement.style.height = pixelSize + 'px';
+        pixelElement.style.borderRadius = '50%';
+        pixelElement.style.zIndex = '1';
+        
+        // Позиция
+        pixelElement.style.left = (x * pixelSize) + 'px';
+        pixelElement.style.top = (y * pixelSize) + 'px';
+        
+        // Сохраняем данные для анимации
+        pixelElement.dataset.baseX = x * pixelSize;
+        pixelElement.dataset.baseY = y * pixelSize;
+        pixelElement.dataset.angle = angle;
+        pixelElement.dataset.distance = distanceFromCenter;
+        pixelElement.dataset.speed = 0.2 + Math.random() * 0.4; // Разная скорость
+        
+        // Цвет пикселя
+        const colorIndex = Math.floor(Math.random() * colors.length);
+        pixelElement.style.backgroundColor = colors[colorIndex];
+        
+        // Прозрачность
+        pixelElement.style.opacity = 0.6 + Math.random() * 0.4; // От 60% до 100%
+        
+        // Классы для анимаций
+        pixelElement.className = 'pixel siri-pixel';
+        
+        // Добавляем в фрагмент
+        fragment.appendChild(pixelElement);
+    }
     
-    // Создаем базовый шаблон для аморфной фигуры типа Siri
-    const baseShape = generateSiriLikeShape(centerX, centerY, gridSize * 0.3, totalPoints / 3);
-    
-    // Создаем ТОЛЬКО один слой на мобильных устройствах
-    const layers = isMobile ? [
-        { pixels: baseShape, scale: 1.0, opacity: 0.9, zIndex: 3 }
-    ] : [
-        { pixels: baseShape, scale: 1.0, opacity: 0.9, zIndex: 3 },
-        { pixels: generateSiriLikeShape(centerX, centerY, gridSize * 0.35, totalPoints / 3), scale: 1.1, opacity: 0.6, zIndex: 2 },
-        { pixels: generateSiriLikeShape(centerX, centerY, gridSize * 0.4, totalPoints / 3), scale: 1.2, opacity: 0.4, zIndex: 1 }
-    ];
-    
-    // Создаем пиксели для каждого слоя
-    layers.forEach((layer, layerIndex) => {
-        // Для мобильных берем только каждый второй пиксель для ещё большей оптимизации
-        const pixelsToRender = isMobile ? 
-            layer.pixels.filter((_, idx) => idx % 2 === 0) : 
-            layer.pixels;
-            
-        pixelsToRender.forEach(pixel => {
-            const pixelElement = document.createElement('div');
-            
-            // Общие свойства
-            pixelElement.style.position = 'absolute';
-            pixelElement.style.width = pixelSize + 'px';
-            pixelElement.style.height = pixelSize + 'px';
-            pixelElement.style.borderRadius = '50%';
-            pixelElement.style.zIndex = layer.zIndex;
-            
-            // Позиция с учетом масштаба слоя
-            const scaleFactor = layer.scale;
-            const x = centerX + (pixel.x - centerX) * scaleFactor;
-            const y = centerY + (pixel.y - centerY) * scaleFactor;
-            
-            pixelElement.style.left = (x * pixelSize) + 'px';
-            pixelElement.style.top = (y * pixelSize) + 'px';
-            
-            // Устанавливаем атрибуты для волновой анимации
-            pixelElement.dataset.baseX = x * pixelSize;
-            pixelElement.dataset.baseY = y * pixelSize;
-            pixelElement.dataset.wavePhase = ((x / gridSize) + (y / gridSize)) * Math.PI;
-            pixelElement.dataset.layer = layerIndex;
-            
-            // Раскрашиваем в зависимости от положения и слоя
-            const colorIndex = (Math.floor(x + y) + layerIndex) % colors.length;
-            pixelElement.style.backgroundColor = colors[colorIndex];
-            
-            // Устанавливаем прозрачность
-            pixelElement.style.opacity = layer.opacity * (0.7 + Math.random() * 0.3);
-            
-            // Добавляем классы для анимаций
-            pixelElement.className = 'pixel siri-pixel';
-            
-            // Ограничиваем количество highlight-пикселей на мобильных еще сильнее
-            const highlightThreshold = isMobile ? 0.98 : 0.9;
-            
-            // Особые пиксели для создания эффекта светящихся частиц
-            if (Math.random() > highlightThreshold) {
-                pixelElement.className += ' siri-highlight';
-                
-                // На мобильных вообще не добавляем тени (box-shadow)
-                if (!isMobile) {
-                    pixelElement.style.boxShadow = `0 0 ${3 + Math.random() * 5}px ${colors[colorIndex]}`;
-                    
-                    const animDuration = 2 + Math.random() * 3;
-                    const animDelay = Math.random() * 2;
-                    pixelElement.style.animation = `glowPulse ${animDuration}s infinite alternate ${animDelay}s`;
-                }
-            }
-            
-            // Добавляем элемент в фрагмент
-            fragment.appendChild(pixelElement);
-        });
-    });
-    
-    // Создаем центральный яркий элемент как у Siri
+    // Создаем яркий центральный элемент
     const siriCore = document.createElement('div');
     siriCore.className = 'siri-core';
     siriCore.style.position = 'absolute';
-    siriCore.style.width = (gridSize * 0.15 * pixelSize) + 'px';
-    siriCore.style.height = (gridSize * 0.15 * pixelSize) + 'px';
+    siriCore.style.width = (gridSize * 0.2 * pixelSize) + 'px';
+    siriCore.style.height = (gridSize * 0.2 * pixelSize) + 'px';
     siriCore.style.borderRadius = '50%';
     siriCore.style.top = '50%';
     siriCore.style.left = '50%';
     siriCore.style.transform = 'translate(-50%, -50%)';
     
-    // Упрощаем градиенты для мобильных
+    // Красивое свечение для центрального элемента
     if (isMobile) {
-        siriCore.style.background = 'rgba(0, 210, 255, 0.7)';
-        siriCore.style.boxShadow = '0 0 10px rgba(0, 210, 255, 0.4)';
+        // Упрощенная версия для мобильных
+        siriCore.style.background = 'rgb(0, 210, 255)';
+        siriCore.style.boxShadow = '0 0 15px rgba(0, 210, 255, 0.8)';
     } else {
-        siriCore.style.background = 'radial-gradient(circle at center, rgba(255, 255, 255, 0.9), rgba(0, 210, 255, 0.7) 50%, rgba(130, 10, 210, 0.5) 80%)';
-        siriCore.style.boxShadow = '0 0 20px rgba(0, 210, 255, 0.8), 0 0 40px rgba(130, 10, 210, 0.4)';
-        siriCore.style.animation = 'corePulse 4s infinite alternate';
+        // Полная версия для десктопов
+        siriCore.style.background = 'radial-gradient(circle at center, rgba(255, 255, 255, 0.9), rgba(0, 210, 255, 0.8) 60%)';
+        siriCore.style.boxShadow = '0 0 20px rgba(0, 210, 255, 0.8), 0 0 30px rgba(0, 180, 230, 0.4)';
     }
     
-    siriCore.style.zIndex = '4';
+    siriCore.style.zIndex = '3';
     
-    // Добавляем свечение вокруг всей фигуры только для десктопа
-    if (!isMobile) {
-        const glow = document.createElement('div');
-        glow.className = 'avatar-glow';
-        glow.style.zIndex = '0';
-        fragment.appendChild(glow);
-    }
+    // Добавляем свечение вокруг аватара
+    const glow = document.createElement('div');
+    glow.className = 'avatar-glow';
+    glow.style.position = 'absolute';
+    glow.style.top = '50%';
+    glow.style.left = '50%';
+    glow.style.transform = 'translate(-50%, -50%)';
+    glow.style.width = '90%';
+    glow.style.height = '90%';
+    glow.style.borderRadius = '50%';
+    glow.style.background = 'radial-gradient(circle at center, rgba(0, 210, 255, 0.15) 30%, transparent 70%)';
+    glow.style.zIndex = '0';
     
-    // Добавляем все элементы в DOM за одну операцию
+    // Добавляем все элементы в DOM
     fragment.appendChild(siriCore);
+    fragment.appendChild(glow);
     container.appendChild(fragment);
     
-    // Запускаем волновую анимацию - более медленную на мобильных
-    startAdvancedWaveAnimation(container, startTime, isMobile);
+    // Запускаем плавную анимацию
+    startSmoothAnimation(container);
 }
 
-// Функция для генерации аморфной формы типа Siri
-function generateSiriLikeShape(centerX, centerY, baseRadius, totalPoints) {
-    const pixels = [];
-    
-    // Генерируем случайные точки внутри круга с использованием полярных координат
-    for (let i = 0; i < totalPoints; i++) {
-        // Случайный угол
-        const angle = Math.random() * Math.PI * 2;
-        
-        // Случайное расстояние от центра с концентрацией к центру
-        const rFactor = Math.pow(Math.random(), 0.5); // Повышает концентрацию к центру
-        
-        // Базовый радиус с небольшой вариацией, чтобы форма была аморфной
-        const radius = baseRadius * (0.6 + rFactor * 0.4);
-        
-        // Добавляем волнистость по краям для более органичной формы
-        const waveAmplitude = baseRadius * 0.2;
-        const waveFrequency = 6; // Количество "волн" по периметру
-        const wave = waveAmplitude * Math.sin(angle * waveFrequency);
-        
-        // Итоговое расстояние с волнистостью
-        const distance = radius + wave * rFactor;
-        
-        // Преобразуем полярные координаты в декартовы
-        const x = centerX + Math.cos(angle) * distance;
-        const y = centerY + Math.sin(angle) * distance;
-        
-        // Добавляем точку если она в пределах сетки
-        if (x >= 0 && y >= 0) {
-            pixels.push({ x, y });
-        }
-    }
-    
-    return pixels;
-}
-
-// Расширенная функция для анимации волны и пульсации с оптимизацией для мобильных
-function startAdvancedWaveAnimation(container, startTime, isMobile) {
+// Функция для плавной анимации аватара
+function startSmoothAnimation(container) {
     const pixels = container.querySelectorAll('.siri-pixel');
+    const isMobile = window.innerWidth < 768;
     
-    // Для экстремальной оптимизации на мобильных
-    const frameDelay = isMobile ? 3 : 1; // Ещё больше пропусков кадров
+    // Запускаем анимацию с оптимальной частотой обновления
+    const frameDelay = isMobile ? 3 : 1; // Пропускаем больше кадров на мобильных
     let frameCount = 0;
-    let lastTime = 0;
     
-    // Используем throttling для ограничения частоты обновлений на мобильных
-    const targetFps = isMobile ? 15 : 60; // Ограничиваем до 15 FPS на мобильных
-    const minFrameTime = 1000 / targetFps;
-    
-    // Кэшируем массив пикселей для быстрого доступа
-    const pixelsArray = Array.from(pixels);
-    
-    // Используем объект для хранения предварительно вычисленных значений
-    // это снижает нагрузку на CPU при вычислениях
-    const precomputed = {
-        sin: {},
-        cos: {},
-        basePositions: [] 
-    };
-    
-    // Предварительно вычисляем базовые позиции для всех пикселей
-    pixelsArray.forEach((pixel, idx) => {
-        precomputed.basePositions[idx] = {
-            x: parseFloat(pixel.dataset.baseX),
-            y: parseFloat(pixel.dataset.baseY),
-            phase: parseFloat(pixel.dataset.wavePhase),
-            layer: parseInt(pixel.dataset.layer) || 0
-        };
-    });
-    
-    // Число анимируемых пикселей на мобильных устройствах
-    const pixelRatio = isMobile ? 5 : 1; // Анимируем только 1/5 пикселей за кадр на мобильных
-    
-    function animateWave(timestamp) {
-        // Пропускаем кадры для улучшения производительности
+    function animate() {
         frameCount++;
         
-        // Проверяем, прошло ли минимальное время между кадрами
-        const elapsed = timestamp - lastTime;
-        if (elapsed < minFrameTime) {
-            requestAnimationFrame(animateWave);
-            return;
-        }
-        
-        lastTime = timestamp;
-        
-        // На мобильных пропускаем кадры и ещё больше снижаем частоту анимации
+        // Пропускаем кадры для мобильных устройств
         if (isMobile && frameCount % frameDelay !== 0) {
-            requestAnimationFrame(animateWave);
+            requestAnimationFrame(animate);
             return;
         }
         
-        const currentTime = Date.now();
-        const elapsedTime = (currentTime - startTime) / 1000; // Время в секундах
+        const time = Date.now() / 1000;
         
-        // Для мобильных устройств анимируем только часть пикселей за раз
-        // и используем более медленную анимацию
-        const batchSize = Math.ceil(pixelsArray.length / pixelRatio);
-        const startIdx = isMobile ? (frameCount % pixelRatio) * batchSize : 0;
-        const endIdx = isMobile ? Math.min(startIdx + batchSize, pixelsArray.length) : pixelsArray.length;
+        // Анимируем только некоторые пиксели в каждом кадре на мобильных
+        const batchSize = isMobile ? Math.ceil(pixels.length / 4) : pixels.length;
+        const startIdx = isMobile ? (frameCount % 4) * batchSize : 0;
+        const endIdx = isMobile ? Math.min(startIdx + batchSize, pixels.length) : pixels.length;
         
-        // Анимируем только подмножество пикселей в этом кадре
+        // Обновляем только выбранные пиксели
         for (let i = startIdx; i < endIdx; i++) {
-            const pixel = pixelsArray[i];
+            const pixel = pixels[i];
             
-            // Используем кэшированные базовые позиции
-            const baseData = precomputed.basePositions[i];
-            const baseX = baseData.x;
-            const baseY = baseData.y;
-            const phase = baseData.phase;
-            const layer = baseData.layer;
+            const baseX = parseFloat(pixel.dataset.baseX);
+            const baseY = parseFloat(pixel.dataset.baseY);
+            const angle = parseFloat(pixel.dataset.angle || 0);
+            const speed = parseFloat(pixel.dataset.speed || 0.3);
             
-            // Параметры волны зависят от слоя - сильно уменьшены для мобильных
-            const amplitude = isMobile ? 
-                (0.3 + layer * 0.15) : // Ещё меньшая амплитуда для мобильных
-                (1 + layer * 0.5);     // Стандартная амплитуда
-                
-            const speed = isMobile ?
-                (0.2 - layer * 0.05) : // Ещё медленнее для мобильных
-                (0.8 - layer * 0.2);   // Стандартная скорость
+            // Создаем плавное движение
+            // Увеличиваем амплитуду движения в 2 раза для более заметного эффекта орбиты
+            const offsetX = Math.sin(time * speed + angle) * 10;
+            const offsetY = Math.cos(time * speed + angle * 0.7) * 10;
             
-            // Кэширование sin/cos для повторяющихся значений
-            const sinKey = Math.round((elapsedTime * speed + phase) * 100);
-            const cosKey = Math.round((elapsedTime * speed * 0.7 + phase + Math.PI/4) * 100);
-            
-            if (!precomputed.sin[sinKey]) {
-                precomputed.sin[sinKey] = Math.sin(elapsedTime * speed + phase);
-            }
-            if (!precomputed.cos[cosKey]) {
-                precomputed.cos[cosKey] = Math.cos(elapsedTime * speed * 0.7 + phase + Math.PI/4);
-            }
-            
-            // Используем предварительно вычисленные значения
-            const waveX = baseX + amplitude * precomputed.sin[sinKey];
-            const waveY = baseY + amplitude * precomputed.cos[cosKey];
-            
-            // Сверхупрощенная версия для мобильных - только перемещение без масштабирования и эффектов
-            if (isMobile) {
-                pixel.style.transform = `translate(${waveX - baseX}px, ${waveY - baseY}px)`;
-                continue; // Пропускаем остальные вычисления для мобильных
-            }
-            
-            // Полная версия с пульсацией только для десктопов
-            const centerX = container.clientWidth / 2;
-            const centerY = container.clientHeight / 2;
-            const distanceToCenter = Math.sqrt(Math.pow(baseX - centerX, 2) + Math.pow(baseY - centerY, 2));
-            const normalizedDistance = distanceToCenter / (container.clientWidth / 2);
-            
-            // Пульсация увеличивается к краям
-            const pulseFactor = 0.5 + normalizedDistance * 0.5;
-            const pulseAmplitude = 0.3 * pulseFactor;
-            const pulsePhase = elapsedTime * 0.5 + normalizedDistance * 5;
-            
-            // Применяем новые координаты с волновым эффектом и пульсацией
-            pixel.style.transform = `translate(${waveX - baseX}px, ${waveY - baseY}px) scale(${1 + pulseAmplitude * Math.sin(pulsePhase)})`;
+            // Применяем трансформацию
+            pixel.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
         }
         
-        // Очищаем кэш вычислений, если он стал слишком большим
-        if (Object.keys(precomputed.sin).length > 1000) {
-            precomputed.sin = {};
-            precomputed.cos = {};
-        }
-        
-        // Запускаем следующий кадр анимации
-        requestAnimationFrame(animateWave);
+        // Продолжаем анимацию
+        requestAnimationFrame(animate);
     }
     
     // Запускаем анимацию
-    requestAnimationFrame(animateWave);
+    requestAnimationFrame(animate);
+    
+    // Анимация пульсации для центрального элемента
+    const siriCore = container.querySelector('.siri-core');
+    if (siriCore && !isMobile) {
+        // Только для десктопов делаем анимацию пульсации
+        siriCore.style.animation = 'corePulse 4s infinite alternate';
+    }
 }
 
 function createDigitalParticles() {
