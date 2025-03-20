@@ -97,9 +97,10 @@ body::before {
     width: 2px;
     height: 2px;
     border-radius: 50%;
-    box-shadow: 0 0 10px 2px rgba(0, 200, 255, 0.3);
-    animation: floatingParticles 15s infinite linear;
+    box-shadow: 0 0 5px rgba(0, 200, 255, 0.2);
+    transition: transform 10s linear;
     z-index: -1;
+    will-change: transform;
 }
 
 header {
@@ -131,12 +132,82 @@ h1 {
 }
 
 .pixel-avatar {
-    width: 140px;
-    height: 140px;
+    width: 150px;
+    height: 150px;
+    background: transparent;
+    border-radius: 50%;
     position: relative;
-    border-radius: 0;
     overflow: visible;
-    margin-bottom: 15px;
+    will-change: transform;
+}
+
+.siri-pixel {
+    will-change: transform, opacity;
+    transition: transform 0.1s ease-out, opacity 0.3s ease;
+    transform-origin: center;
+}
+
+.siri-highlight {
+    z-index: 5;
+    will-change: opacity, box-shadow;
+}
+
+.siri-core {
+    will-change: transform, opacity, box-shadow;
+    pointer-events: none;
+}
+
+.avatar-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 90%;
+    background: radial-gradient(circle at center, rgba(0, 210, 255, 0.15) 10%, rgba(130, 10, 210, 0.1) 50%, transparent 70%);
+    border-radius: 50%;
+    animation: glowRadiate 8s infinite alternate;
+    z-index: 0;
+    pointer-events: none;
+    backdrop-filter: blur(5px);
+}
+
+/* Добавляем стили для робота */
+.robot-eye {
+    background: #19A1F1;
+    box-shadow: 0 0 10px #19A1F1;
+    z-index: 2;
+}
+
+.robot-mouth {
+    background: rgba(0, 210, 255, 0.7);
+    box-shadow: 0 0 8px rgba(0, 210, 255, 0.8);
+    z-index: 2;
+}
+
+.robot-antenna {
+    background: rgba(130, 10, 210, 0.85);
+    box-shadow: 0 0 8px rgba(130, 10, 210, 0.7);
+    z-index: 2;
+}
+
+.robot-head {
+    background: rgba(70, 140, 255, 0.4);
+    z-index: 1;
+}
+
+.robot-special {
+    background: rgba(0, 255, 255, 0.9);
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.7);
+    z-index: 2;
+}
+
+/* Стилизация пикселей для создания эффекта переливающейся волны */
+.pixel {
+    transition: transform 0.2s ease-in-out;
+    will-change: transform, opacity;
+    /* Делаем пиксели меньше для более детализированного изображения */
+    transform-origin: center;
 }
 
 @keyframes pixelFloat {
@@ -186,9 +257,9 @@ h1 {
     height: 100%;
     background: linear-gradient(90deg, #00d2ff, #3a7bd5);
     border-radius: 10px;
-    position: relative;
-    transition: width 1s ease;
-    box-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+    width: 13%;
+    transition: width 0.8s ease;
+    will-change: width;
 }
 
 .progress-fill::after {
@@ -330,34 +401,23 @@ h1 {
 }
 
 .action-button {
-    padding: 1rem 1.5rem;
+    padding: 1rem;
+    border-radius: 10px;
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
     color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
     position: relative;
+    transition: all 0.3s ease;
     overflow: hidden;
     z-index: 1;
+    will-change: transform;
 }
 
-.action-button:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: all 0.5s;
-    z-index: -1;
-}
-
-.action-button:hover:before {
-    left: 100%;
+.action-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .action-button.locked {
@@ -435,11 +495,13 @@ h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(10, 20, 30, 0.8);
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 100;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    will-change: opacity;
 }
 
 .modal-content {
@@ -449,10 +511,11 @@ h1 {
     width: 90%;
     max-width: 600px;
     position: relative;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(0, 210, 255, 0.2);
     animation: modal-appear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     overflow: hidden;
+    will-change: transform, opacity;
 }
 
 .modal-content::before {
@@ -675,16 +738,16 @@ h1 {
 
 /* Стили для терминала */
 .terminal-window {
-    width: 90%;
-    max-width: 600px;
+    width: 100%;
     background: rgba(10, 17, 25, 0.95);
     border-radius: 8px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     overflow: hidden;
     font-family: 'Courier New', monospace;
     border: 1px solid rgba(0, 210, 255, 0.3);
     animation: modal-appear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
+    will-change: transform, opacity;
 }
 
 .terminal-header {
@@ -822,27 +885,13 @@ h1 {
 .btn-glow::after {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: rgba(106, 0, 244, 0.2);
-    transform: rotate(30deg);
-    animation: glowEffect 3s infinite;
-}
-
-@keyframes glowEffect {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, -50%) rotate(30deg);
-    }
-    20% {
-        opacity: 0.5;
-    }
-    100% {
-        opacity: 0;
-        transform: translate(50%, 50%) rotate(30deg);
-    }
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(106, 0, 244, 0.2), transparent);
+    transform: translate3d(0, 0, 0) skewX(-20deg);
+    transition: all 0.5s ease;
 }
 
 /* Стили для модального окна бота */
@@ -983,4 +1032,9 @@ h1 {
     transform: translateY(0);
     opacity: 1;
     visibility: visible;
+}
+
+/* CSS for particles canvas */
+.particles-canvas {
+    pointer-events: none;
 } 
