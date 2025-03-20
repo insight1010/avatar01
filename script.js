@@ -450,15 +450,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Функция для открытия Telegram бота
     function openTelegramBot() {
-        // Открываем ссылку на бота
-        window.open("https://t.me/LivingAvatar_Bot", "_blank");
+        // Формируем URL с параметром start и дополнительным параметром для приветствия
+        const botUrl = "https://t.me/LivingAvatar_Bot?start=welcome";
+        
+        // Открываем ссылку на бота с параметром start
+        window.open(botUrl, "_blank");
         
         // Альтернативный способ через API Telegram
         try {
-            telegramWebApp.openTelegramLink("https://t.me/LivingAvatar_Bot");
+            telegramWebApp.openTelegramLink(botUrl);
         } catch (e) {
             console.log("Ошибка открытия ссылки через Telegram API:", e);
         }
+        
+        // Показываем уведомление об успешном подключении
+        telegramWebApp.showPopup({
+            title: 'Подключение к боту',
+            message: 'Ваш персональный цифровой аватар готов к общению! Расскажите ему о себе, чтобы ускорить обучение.',
+            buttons: [{type: 'ok'}]
+        });
         
         // Обновляем прогресс
         const currentProgress = parseInt(daysPassed.textContent);
@@ -650,6 +660,19 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Открываем бота в Telegram
         openTelegramBot();
+        
+        // Если это Telegram WebApp, можем использовать встроенную аналитику
+        if (telegramWebApp.isExpanded) {
+            try {
+                // Отправляем аналитику в Telegram (если доступно)
+                telegramWebApp.sendData(JSON.stringify({
+                    action: "bot_connect",
+                    from: "miniapp"
+                }));
+            } catch (e) {
+                console.log("Ошибка отправки данных в Telegram:", e);
+            }
+        }
     });
     
     // Закрываем модальные окна по клику вне их содержимого
