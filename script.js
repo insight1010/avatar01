@@ -500,23 +500,34 @@ function initApp() {
 
     // Функция для открытия Telegram бота
     function openTelegramBot() {
-        // Формируем URL с параметром start и дополнительным параметром для приветствия
-        const botUrl = "https://t.me/LivingAvatar_Bot?start=welcome";
+        // Формируем правильный URL с параметром start
+        // Параметр должен быть после /start без знака вопроса
+        const botName = "LivingAvatar_Bot";
+        const startParam = "welcome";
+        const botUrl = `https://t.me/${botName}?start=${startParam}`;
         
-        // Открываем ссылку на бота с параметром start
-        window.open(botUrl, "_blank");
+        console.log("Открываем ссылку на бота:", botUrl);
         
-        // Альтернативный способ через API Telegram
+        // Предпочтительно использовать Telegram API для открытия ссылки
         try {
-            telegramWebApp.openTelegramLink(botUrl);
+            if (telegramWebApp && telegramWebApp.openTelegramLink) {
+                telegramWebApp.openTelegramLink(botUrl);
+                console.log("Ссылка открыта через Telegram API");
+            } else {
+                // Запасной вариант, если API недоступен
+                window.open(botUrl, "_blank");
+                console.log("Ссылка открыта через window.open");
+            }
         } catch (e) {
-            console.log("Ошибка открытия ссылки через Telegram API:", e);
+            console.error("Ошибка открытия ссылки:", e);
+            // В случае ошибки используем window.open
+            window.open(botUrl, "_blank");
         }
         
         // Показываем уведомление об успешном подключении
         telegramWebApp.showPopup({
             title: 'Подключение к боту',
-            message: 'Ваш персональный цифровой аватар готов к общению! Расскажите ему о себе, чтобы ускорить обучение.',
+            message: 'Ваш персональный цифровой аватар готов к общению! Нажмите START в окне бота или отправьте команду /start для начала.',
             buttons: [{type: 'ok'}]
         });
         
