@@ -393,13 +393,13 @@ h1 {
     cursor: pointer;
     position: relative;
     display: inline-block;
-    transition: none;
+    transition: none !important;
     padding-right: 30px;
 }
 
 .clickable-title:hover {
-    transform: none;
-    text-shadow: none;
+    transform: none !important;
+    text-shadow: none !important;
 }
 
 .clickable-title::after {
@@ -410,13 +410,13 @@ h1 {
     right: 0;
     transform: translateY(-50%);
     opacity: 0.8;
-    transition: none;
+    transition: none !important;
 }
 
 .clickable-title:hover::after {
     opacity: 1;
-    transform: translateY(-50%);
-    right: 0;
+    transform: translateY(-50%) !important;
+    right: 0 !important;
 }
 
 .info-container p {
@@ -459,15 +459,15 @@ h1 {
     font-size: 1rem;
     cursor: pointer;
     position: relative;
-    transition: none;
+    transition: none !important;
     overflow: hidden;
     z-index: 1;
-    will-change: transform;
+    will-change: auto;
 }
 
 .action-button:hover {
-    transform: none;
-    box-shadow: none;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
 /* Стили для заблокированных кнопок */
@@ -499,8 +499,8 @@ h1 {
 
 /* Отключаем hover эффекты для заблокированных кнопок */
 .action-button.locked:hover {
-    transform: none;
-    box-shadow: none;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
 /* Иконка ожидания */
@@ -519,55 +519,24 @@ h1 {
 
 /* Сообщение о блокировке */
 .lock-message {
-    position: absolute;
-    top: -65px;
-    left: 50%;
-    width: auto;
-    max-width: 280px;
-    transform: translateX(-50%);
-    background: rgba(0, 15, 30, 0.95);
-    color: #fff;
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    z-index: 100;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5),
-                0 0 12px rgba(0, 210, 255, 0.6);
-    border: 1px solid rgba(0, 210, 255, 0.4);
-    backdrop-filter: blur(5px);
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
 }
 
-/* Добавляем стрелочку под сообщением */
-.lock-message:after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 8px solid rgba(0, 15, 30, 0.95);
-}
-
-/* Показываем подсказку при наведении без анимации */
+/* Отключаем показ подсказки даже при наведении */
 .action-button.locked:hover .lock-message {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    transform: none !important;
 }
 
 /* Анимация нажатия на заблокированную кнопку */
 .action-button.locked:active {
-    transform: none;
-    background: linear-gradient(45deg, #232a37, #313e56);
-    transition: none;
+    transform: none !important;
+    background: linear-gradient(45deg, #293042, #38445f);
+    transition: none !important;
 }
 
 .btn-1 {
@@ -675,7 +644,6 @@ h1 {
     font-size: 1.5rem;
     cursor: pointer;
     color: #ccc;
-    transition: all 0.3s ease;
     height: 24px;
     width: 24px;
     display: flex;
@@ -683,12 +651,13 @@ h1 {
     justify-content: center;
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.2);
+    transition: none !important;
 }
 
 .close-btn:hover {
     color: #fff;
     background: rgba(0, 210, 255, 0.3);
-    transform: rotate(90deg);
+    transform: none !important;
 }
 
 .input-area {
@@ -745,8 +714,8 @@ h1 {
     }
     
     .siri-pixel {
-        transform: translate3d(0, 0, 0);
-        transition: transform 0.2s linear;
+        transform: translate3d(0, 0, 0) !important;
+        transition: none !important;
         box-shadow: none !important;
     }
     
@@ -764,27 +733,36 @@ h1 {
     }
     
     .avatar-glow {
-        display: none;
+        display: none !important;
     }
     
     .action-button {
-        background: var(--primary-color);
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        background: var(--primary-color) !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
         transform: none !important;
+        transition: none !important;
     }
     
     .action-button:hover {
         transform: none !important;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
+        transition: none !important;
     }
     
     .container::after,
     body::before {
-        display: none;
+        display: none !important;
     }
     
     body {
-        background: #0f2027;
+        background: #0f2027 !important;
+    }
+    
+    /* Отключаем все hover-эффекты на мобильных устройствах */
+    *:hover {
+        transform: none !important;
+        transition: none !important;
+        animation: none !important;
     }
 }
 
@@ -835,17 +813,6 @@ h1 {
     .progress-info {
         font-size: 0.8rem;
         margin-top: 6px;
-    }
-    
-    .lock-message {
-        max-width: 250px;
-        bottom: auto;
-        top: -65px;
-        padding: 8px 12px;
-        font-size: 0.85rem;
-        z-index: 150;
-        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.6),
-                   0 0 8px rgba(0, 210, 255, 0.7);
     }
     
     .lock-icon {
@@ -992,40 +959,34 @@ h1 {
 }
 
 .terminal-btn {
-    background: linear-gradient(90deg, #00556f, #0089a7);
+    padding: 0.8rem 1.2rem;
+    margin-top: 1rem;
+    background: linear-gradient(90deg, #006d84, #0089a7);
     border: none;
-    padding: 10px 20px;
-    color: #c5e1f0;
-    font-family: 'Courier New', monospace;
+    color: white;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s ease;
     letter-spacing: 1px;
     width: 100%;
     border-radius: 3px;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
     position: relative;
     overflow: hidden;
+    transition: none !important;
 }
 
 .terminal-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    transition: all 0.5s;
+    display: none !important;
 }
 
 .terminal-btn:hover::before {
-    left: 100%;
+    display: none !important;
 }
 
 .terminal-btn:hover {
     background: linear-gradient(90deg, #0089a7, #00aace);
-    box-shadow: 0 5px 15px rgba(0, 137, 167, 0.3);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    transform: none !important;
 }
 
 @keyframes blink {
@@ -1132,17 +1093,20 @@ h1 {
     font-weight: 600;
     margin-top: 1rem;
     cursor: pointer;
-    transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+    transition: none !important;
 }
 
 .telegram-btn:hover {
-    transform: none;
-    box-shadow: none;
+    background: linear-gradient(45deg, #0088cc, #0099ff);
+    box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+    transform: none !important;
 }
 
 .telegram-btn:active {
-    transform: translateY(0);
+    background: linear-gradient(45deg, #0088cc, #0099ff);
+    box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+    transform: none !important;
 }
 
 /* CSS for particles canvas */
@@ -1239,9 +1203,9 @@ h1 {
 .action-button:active,
 .telegram-btn:active,
 .terminal-btn:active {
-    transform: none;
-    box-shadow: none;
-    transition: none;
+    transform: none !important;
+    box-shadow: none !important;
+    transition: none !important;
 }
 
 /* Стили для чата в Telegram */
