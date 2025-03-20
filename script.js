@@ -4,19 +4,61 @@ document.addEventListener('DOMContentLoaded', function() {
     telegramWebApp.expand(); // Разворачиваем на весь экран
     telegramWebApp.ready(); // Сообщаем о готовности приложения
     
+    // Получаем initData Telegram для корректной работы WebApp
+    const initData = telegramWebApp.initData || '';
+    const initDataUnsafe = telegramWebApp.initDataUnsafe || {};
+    
+    // Проверяем наличие параметров из Telegram
+    const userId = initDataUnsafe.user ? initDataUnsafe.user.id : null;
+    const userName = initDataUnsafe.user ? initDataUnsafe.user.username : null;
+    
+    // Адаптируем интерфейс под стартовый параметр, если он есть
+    const startParam = telegramWebApp.startParam || '';
+    if (startParam === 'fast_start') {
+        // Быстрый старт: сразу показываем бота
+        setTimeout(() => {
+            const botModal = document.getElementById('bot-modal');
+            if (botModal) botModal.style.display = 'flex';
+        }, 1000);
+    }
+    
     // Отключаем вертикальные свайпы для улучшения скроллинга
     if (telegramWebApp.disableVerticalSwipes) {
         telegramWebApp.disableVerticalSwipes();
     }
     
-    // Определяем возможности устройства для дальнейшей оптимизации
+    // Проверяем тип устройства и платформу
+    // Важно! Нужно проверять platform, а не просто ширину экрана
     const isMobile = window.innerWidth < 768;
-    const isWeakDevice = isMobile || (telegramWebApp.platform && 
-                      (telegramWebApp.platform.includes('android') || 
-                       telegramWebApp.platform.includes('ios')));
+    const isMobileDevice = telegramWebApp.platform ? 
+        ['android', 'ios', 'android_x', 'ios_x'].includes(telegramWebApp.platform) : 
+        isMobile;
+    
+    const isWeakDevice = isMobileDevice || 
+                       (telegramWebApp.platform === 'web' && window.innerWidth < 768);
                        
     // Глобальная переменная для контроля качества эффектов
     window.isLowPerformanceMode = isWeakDevice;
+    
+    // Получаем информацию о цветовой схеме Telegram
+    const isLightTheme = telegramWebApp.colorScheme === 'light';
+    
+    // Меняем цвета в зависимости от темы Telegram
+    if (isLightTheme) {
+        document.documentElement.style.setProperty('--bg-color', '#f0f2f5');
+        document.documentElement.style.setProperty('--text-color', '#240046');
+        document.documentElement.style.setProperty('--card-bg', '#ffffff');
+        document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+        document.documentElement.style.setProperty('--bg-color', '#10002b');
+        document.documentElement.style.setProperty('--card-bg', '#240046');
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+    
+    // Устанавливаем безопасные отступы под MainButton, если он активен
+    if (telegramWebApp.MainButton && telegramWebApp.MainButton.isVisible) {
+        document.body.style.paddingBottom = '80px';
+    }
     
     // Устанавливаем пассивные обработчики событий для лучшей производительности
     document.addEventListener('touchmove', function(e) {
@@ -35,16 +77,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.remove('is-scrolling');
         }, 150);
     }, { passive: true });
-    
-    // Изменение стилей в соответствии с темой Telegram
-    if (telegramWebApp.colorScheme === 'dark') {
-        document.documentElement.style.setProperty('--bg-color', '#10002b');
-        document.documentElement.style.setProperty('--card-bg', '#240046');
-    } else {
-        document.documentElement.style.setProperty('--bg-color', '#f0f2f5');
-        document.documentElement.style.setProperty('--text-color', '#240046');
-        document.documentElement.style.setProperty('--card-bg', '#ffffff');
-    }
     
     // DOM элементы - кэшируем все селекторы для увеличения производительности
     const addBotBtn = document.getElementById('add-bot-btn');
@@ -68,11 +100,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // для лучшей производительности и отладки
     
     // Создание пиксельного аватара с учетом производительности устройства
-    createPixelAvatar(pixelAvatar);
+    if (pixelAvatar) {
+        createPixelAvatar(pixelAvatar);
+    } else {
+        console.error("Элемент pixel-avatar не найден");
+    }
     
     // Анимируем прогресс-бар при загрузке - отложенный запуск для улучшения первичной загрузки
     setTimeout(() => {
-        animateProgressBar();
+        if (progressFill && daysPassed) {
+            // Установим начальное значение - 4 дня из 30
+            daysPassed.textContent = '4';
+            animateProgressBar();
+        } else {
+            console.error("Элементы прогресс-бара не найдены");
+        }
     }, 100);
     
     // Для слабых устройств создаем фоновые частицы с задержкой
@@ -230,17 +272,38 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Оптимизированная функция для анимации прогресс-бара
     function animateProgressBar() {
-        const currentDays = parseInt(daysPassed.textContent);
-        const totalDays = parseInt(document.querySelector('.days-total').textContent);
+        console.log("Инициализация прогресс-бара");
         
+        if (!daysPassed || !progressFill) {
+            console.error("Элементы прогресс-бара не найдены");
+            return;
+        }
+        
+        // Проверяем, установлено ли начальное значение
+        if (!daysPassed.textContent || daysPassed.textContent === '0') {
+            console.log("Устанавливаем начальное значение прогресса: 4 дня");
+            daysPassed.textContent = '4';
+        }
+        
+        const currentDays = parseInt(daysPassed.textContent);
+        
+        // Получаем общее количество дней
+        const daysTotal = document.querySelector('.days-total');
+        const totalDays = daysTotal ? parseInt(daysTotal.textContent) : 30;
+        
+        console.log(`Прогресс: ${currentDays} из ${totalDays} дней`);
+        
+        // Вычисляем процент прогресса
         const progressPercent = (currentDays / totalDays) * 100;
         
         // На слабых устройствах просто устанавливаем значение без анимации
-        if (isWeakDevice) {
+        if (window.isLowPerformanceMode) {
+            console.log(`Устанавливаем прогресс: ${progressPercent}% без анимации`);
             progressFill.style.width = progressPercent + '%';
         } else {
             // Используем requestAnimationFrame для плавной анимации
             // и оптимизации производительности
+            console.log(`Анимируем прогресс до ${progressPercent}%`);
             requestAnimationFrame(() => {
                 progressFill.style.width = '0%';
                 
@@ -253,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Проверяем статус кнопок
+        // Проверяем статус кнопок на основе прогресса
         checkButtonsUnlock(currentDays);
     }
     
@@ -298,54 +361,62 @@ document.addEventListener('DOMContentLoaded', function() {
     const telegramBotBtn = document.getElementById('telegram-bot-btn');
     telegramBotBtn.addEventListener('click', openBotModal);
     
-    // Обработчик для кнопки подключения к боту внутри модального окна
-    connectTelegramBtn.addEventListener('click', function() {
-        // Закрываем модальное окно
-        closeBotModal();
-        
-        // Открываем бота в Telegram
-        openTelegramBot();
-    });
-    
-    // Закрываем модальные окна по клику вне их содержимого
-    window.addEventListener('click', function(event) {
-        if (event.target === modal) {
-            closeModal();
-        }
-        if (event.target === infoModal) {
-            closeInfoModal();
-        }
-        if (event.target === botModal) {
-            closeBotModal();
-        }
-    });
-    
-    // Обрабатываем нажатие клавиши Enter в текстовом поле
-    userInput.addEventListener('keypress', function(event) {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            handleUserSubmit();
-        }
-    });
-    
-    // Обработчики событий для новых кнопок
-    addBotBtn.addEventListener('click', function(e) {
+    // Обработчик для кнопок с блокировкой - универсальная функция
+    function handleLockedButton(e) {
         if (this.classList.contains('locked')) {
             e.stopPropagation();
-            // Вместо показа popup, просто подсвечиваем сообщение о блокировке
+            
+            // Добавим небольшую анимацию самой кнопки
+            this.classList.add('shake-effect');
+            
+            // Показываем информативное сообщение
             const lockMessage = this.querySelector('.lock-message');
+            
+            // Удаляем предыдущие таймеры, если есть
+            if (this.dataset.lockTimeout) {
+                clearTimeout(parseInt(this.dataset.lockTimeout));
+            }
+            
+            // Показываем сообщение
             lockMessage.style.opacity = '1';
             lockMessage.style.visibility = 'visible';
-            lockMessage.style.transform = 'translateY(0)';
+            lockMessage.style.transform = 'translateX(-50%) translateY(0)';
+            
+            // Игровая обратная связь для лучшего UX
+            navigator.vibrate && navigator.vibrate(50);
+            
+            // Создаем пульсацию иконки
+            const lockIcon = this.querySelector('.lock-icon');
+            if (lockIcon) {
+                lockIcon.style.animation = 'pulseFade 0.8s 3 ease-in-out';
+            }
             
             // Скрываем сообщение через 3 секунды
-            setTimeout(() => {
+            const timeout = setTimeout(() => {
                 lockMessage.style.opacity = '0';
                 lockMessage.style.visibility = 'hidden';
-                lockMessage.style.transform = 'translateY(-10px)';
+                lockMessage.style.transform = 'translateX(-50%) translateY(10px)';
+                
+                // Удаляем эффект встряски
+                this.classList.remove('shake-effect');
+                
+                // Возвращаем обычную анимацию
+                if (lockIcon) {
+                    lockIcon.style.animation = 'pulseFade 1.5s infinite ease-in-out';
+                }
             }, 3000);
-            return;
+            
+            // Сохраняем ID таймера для возможной отмены
+            this.dataset.lockTimeout = timeout;
+            return false;
         }
+        
+        return true;
+    }
+    
+    // Применяем обработчик ко всем заблокированным кнопкам
+    addBotBtn.addEventListener('click', function(e) {
+        if (!handleLockedButton.call(this, e)) return;
         
         telegramWebApp.showPopup({
             title: 'Добавление бота в чаты',
@@ -355,22 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     connectChatsBtn.addEventListener('click', function(e) {
-        if (this.classList.contains('locked')) {
-            e.stopPropagation();
-            // Вместо показа popup, просто подсвечиваем сообщение о блокировке
-            const lockMessage = this.querySelector('.lock-message');
-            lockMessage.style.opacity = '1';
-            lockMessage.style.visibility = 'visible';
-            lockMessage.style.transform = 'translateY(0)';
-            
-            // Скрываем сообщение через 3 секунды
-            setTimeout(() => {
-                lockMessage.style.opacity = '0';
-                lockMessage.style.visibility = 'hidden';
-                lockMessage.style.transform = 'translateY(-10px)';
-            }, 3000);
-            return;
-        }
+        if (!handleLockedButton.call(this, e)) return;
         
         telegramWebApp.showPopup({
             title: 'Подключение к записям разговоров',
@@ -380,22 +436,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     connectArBtn.addEventListener('click', function(e) {
-        if (this.classList.contains('locked')) {
-            e.stopPropagation();
-            // Вместо показа popup, просто подсвечиваем сообщение о блокировке
-            const lockMessage = this.querySelector('.lock-message');
-            lockMessage.style.opacity = '1';
-            lockMessage.style.visibility = 'visible';
-            lockMessage.style.transform = 'translateY(0)';
-            
-            // Скрываем сообщение через 3 секунды
-            setTimeout(() => {
-                lockMessage.style.opacity = '0';
-                lockMessage.style.visibility = 'hidden';
-                lockMessage.style.transform = 'translateY(-10px)';
-            }, 3000);
-            return;
-        }
+        if (!handleLockedButton.call(this, e)) return;
         
         telegramWebApp.showPopup({
             title: 'Подключение к AR очкам',
@@ -602,21 +643,201 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Обеспечиваем корректную работу всех крестиков в модальных окнах
-    document.querySelectorAll('.close-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Определяем, какое модальное окно нужно закрыть
-            const parentModal = this.closest('.modal');
-            if (parentModal) {
-                parentModal.style.display = 'none';
-            }
-        });
+    // Обработчик для кнопки подключения к боту внутри модального окна
+    connectTelegramBtn.addEventListener('click', function() {
+        // Закрываем модальное окно
+        closeBotModal();
+        
+        // Открываем бота в Telegram
+        openTelegramBot();
     });
+    
+    // Закрываем модальные окна по клику вне их содержимого
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+    
+    infoModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeInfoModal();
+        }
+    });
+    
+    botModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeBotModal();
+        }
+    });
+    
+    // Проверяем, что все крестики на странице работают корректно
+    // Устанавливаем обработчики напрямую для каждого крестика
+    const botCloseBtnElement = document.querySelector('.bot-close-btn');
+    if (botCloseBtnElement) {
+        botCloseBtnElement.onclick = function() {
+            const modalElement = document.getElementById('bot-modal');
+            if (modalElement) modalElement.style.display = 'none';
+        };
+    }
+    
+    const infoCloseBtnElement = document.querySelector('.info-close-btn');
+    if (infoCloseBtnElement) {
+        infoCloseBtnElement.onclick = function() {
+            const modalElement = document.getElementById('info-modal');
+            if (modalElement) modalElement.style.display = 'none';
+        };
+    }
+    
+    const mainCloseBtnElement = document.querySelector('.terminal-window .close-btn');
+    if (mainCloseBtnElement) {
+        mainCloseBtnElement.onclick = function() {
+            const modalElement = document.getElementById('modal');
+            if (modalElement) modalElement.style.display = 'none';
+        };
+    }
+    
+    // Обрабатываем нажатие клавиши Enter в текстовом поле
+    userInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            handleUserSubmit();
+        }
+    });
+
+    // Устанавливаем цвета согласно Telegram WebApp
+    function applyTelegramTheme() {
+        // Применяем цвета из Telegram WebApp, если они доступны
+        const themeParams = telegramWebApp.themeParams || {};
+        
+        if (themeParams.bg_color) {
+            document.documentElement.style.setProperty('--tg-theme-bg-color', themeParams.bg_color);
+        }
+        
+        if (themeParams.text_color) {
+            document.documentElement.style.setProperty('--tg-theme-text-color', themeParams.text_color);
+        }
+        
+        if (themeParams.hint_color) {
+            document.documentElement.style.setProperty('--tg-theme-hint-color', themeParams.hint_color);
+        }
+        
+        if (themeParams.link_color) {
+            document.documentElement.style.setProperty('--tg-theme-link-color', themeParams.link_color);
+        }
+        
+        if (themeParams.button_color) {
+            document.documentElement.style.setProperty('--tg-theme-button-color', themeParams.button_color);
+        }
+        
+        if (themeParams.button_text_color) {
+            document.documentElement.style.setProperty('--tg-theme-button-text-color', themeParams.button_text_color);
+        }
+    }
+    
+    // Применяем цвета
+    applyTelegramTheme();
+    
+    // Настраиваем кнопки Telegram WebApp
+    function setupTelegramButtons() {
+        // Настройка MainButton, если она доступна
+        if (telegramWebApp.MainButton) {
+            // При открытии любого модального окна скрываем MainButton
+            const showMainButton = () => {
+                telegramWebApp.MainButton.setText('Активировать бота');
+                telegramWebApp.MainButton.show();
+                telegramWebApp.MainButton.onClick(() => {
+                    openBotModal();
+                });
+            };
+            
+            showMainButton();
+            
+            // Обработчики для скрытия/показа MainButton при открытии/закрытии модальных окон
+            botModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeBotModal();
+                    showMainButton();
+                }
+            });
+            
+            infoModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeInfoModal();
+                    showMainButton();
+                }
+            });
+            
+            // Скрываем MainButton при открытии модальных окон
+            telegramBotBtn.addEventListener('click', function() {
+                telegramWebApp.MainButton.hide();
+            });
+            
+            digitalSelfTitle.addEventListener('click', function() {
+                telegramWebApp.MainButton.hide();
+            });
+        }
+        
+        // Настройка BackButton, если она доступна
+        if (telegramWebApp.BackButton) {
+            // Показываем кнопку назад только когда открыто модальное окно
+            telegramWebApp.BackButton.hide();
+            
+            // Показываем BackButton при открытии модального окна
+            const modalWindows = [modal, infoModal, botModal];
+            
+            modalWindows.forEach(modalWindow => {
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.attributeName === 'style') {
+                            const isVisible = modalWindow.style.display === 'flex';
+                            if (isVisible) {
+                                telegramWebApp.BackButton.show();
+                                // Действие при нажатии на BackButton
+                                telegramWebApp.BackButton.onClick(() => {
+                                    if (modalWindow === modal) closeModal();
+                                    else if (modalWindow === infoModal) closeInfoModal();
+                                    else if (modalWindow === botModal) closeBotModal();
+                                    
+                                    // Проверяем, есть ли еще открытые модальные окна
+                                    const anyModalOpen = modalWindows.some(m => m.style.display === 'flex');
+                                    if (!anyModalOpen) {
+                                        telegramWebApp.BackButton.hide();
+                                        // Показываем MainButton, если нет открытых модальных окон
+                                        if (telegramWebApp.MainButton) {
+                                            showMainButton();
+                                        }
+                                    }
+                                });
+                            } else {
+                                // Проверяем, есть ли еще открытые модальные окна
+                                const anyModalOpen = modalWindows.some(m => m.style.display === 'flex');
+                                if (!anyModalOpen) {
+                                    telegramWebApp.BackButton.hide();
+                                }
+                            }
+                        }
+                    });
+                });
+                
+                // Начинаем наблюдение за атрибутом style
+                observer.observe(modalWindow, { attributes: true });
+            });
+        }
+    }
+    
+    // Настраиваем кнопки Telegram
+    setupTelegramButtons();
 });
 
 // Функция для создания пиксельного аватара с плавными анимациями
 function createPixelAvatar(container) {
-    if (!container) return;
+    console.log("Создаем аватар в контейнере:", container);
+    
+    if (!container) {
+        console.error("Контейнер для аватара не найден");
+        return;
+    }
     
     // Очищаем контейнер
     container.innerHTML = '';
@@ -637,116 +858,138 @@ function createPixelAvatar(container) {
         'rgba(70, 140, 255, 0.85)',  // Синий
     ];
     
-    // Размер контейнера
-    const containerRect = container.getBoundingClientRect();
-    const containerSize = Math.min(containerRect.width, containerRect.height);
-    const pixelSize = containerSize / gridSize;
+    try {
+        // Размер контейнера
+        const containerRect = container.getBoundingClientRect();
+        console.log("Размер контейнера:", containerRect.width, "x", containerRect.height);
+        
+        const containerSize = Math.min(containerRect.width, containerRect.height);
+        const pixelSize = containerSize / gridSize;
+        
+        // Центр изображения
+        const centerX = gridSize / 2;
+        const centerY = gridSize / 2;
+        
+        // Создаем частицы вокруг центра
+        const totalPoints = isMobile ? 150 : 300; // Количество точек
+        
+        console.log("Генерируем", totalPoints, "точек для аватара");
     
-    // Центр изображения
-    const centerX = gridSize / 2;
-    const centerY = gridSize / 2;
-    
-    // Создаем частицы вокруг центра
-    const totalPoints = isMobile ? 150 : 300; // Количество точек
-    
-    // Генерируем точки в форме круга с небольшим смещением
-    for (let i = 0; i < totalPoints; i++) {
-        // Меняем диапазон расстояния от центра - размещаем частицы ближе к шару
-        // Теперь от 45% до 75% от радиуса вместо 10-50%
-        const distanceFromCenter = Math.random() * 0.3 + 0.45;
+        // Генерируем точки в форме круга с небольшим смещением
+        for (let i = 0; i < totalPoints; i++) {
+            // Меняем диапазон расстояния от центра - размещаем частицы ближе к шару
+            // Теперь от 45% до 75% от радиуса вместо 10-50%
+            const distanceFromCenter = Math.random() * 0.3 + 0.45;
+            
+            // Случайный угол
+            const angle = Math.random() * Math.PI * 2;
+            
+            // Вычисляем координаты с небольшим смещением
+            const radius = gridSize * 0.3; // Базовый радиус
+            const x = centerX + Math.cos(angle) * radius * distanceFromCenter;
+            const y = centerY + Math.sin(angle) * radius * distanceFromCenter;
+            
+            // Создаем элемент пикселя
+            const pixelElement = document.createElement('div');
+            
+            // Общие свойства
+            pixelElement.style.position = 'absolute';
+            pixelElement.style.width = pixelSize + 'px';
+            pixelElement.style.height = pixelSize + 'px';
+            pixelElement.style.borderRadius = '50%';
+            pixelElement.style.zIndex = '1';
+            
+            // Позиция
+            pixelElement.style.left = (x * pixelSize) + 'px';
+            pixelElement.style.top = (y * pixelSize) + 'px';
+            
+            // Сохраняем данные для анимации
+            pixelElement.dataset.baseX = x * pixelSize;
+            pixelElement.dataset.baseY = y * pixelSize;
+            pixelElement.dataset.angle = angle;
+            pixelElement.dataset.distance = distanceFromCenter;
+            pixelElement.dataset.speed = 0.2 + Math.random() * 0.4; // Разная скорость
+            
+            // Цвет пикселя
+            const colorIndex = Math.floor(Math.random() * colors.length);
+            pixelElement.style.backgroundColor = colors[colorIndex];
+            
+            // Прозрачность
+            pixelElement.style.opacity = 0.6 + Math.random() * 0.4; // От 60% до 100%
+            
+            // Классы для анимаций
+            pixelElement.className = 'pixel siri-pixel';
+            
+            // Добавляем в фрагмент
+            fragment.appendChild(pixelElement);
+        }
         
-        // Случайный угол
-        const angle = Math.random() * Math.PI * 2;
+        // Создаем яркий центральный элемент
+        const siriCore = document.createElement('div');
+        siriCore.className = 'siri-core';
+        siriCore.style.position = 'absolute';
+        siriCore.style.width = (gridSize * 0.2 * pixelSize) + 'px';
+        siriCore.style.height = (gridSize * 0.2 * pixelSize) + 'px';
+        siriCore.style.borderRadius = '50%';
+        siriCore.style.top = '50%';
+        siriCore.style.left = '50%';
+        siriCore.style.transform = 'translate(-50%, -50%)';
         
-        // Вычисляем координаты с небольшим смещением
-        const radius = gridSize * 0.3; // Базовый радиус
-        const x = centerX + Math.cos(angle) * radius * distanceFromCenter;
-        const y = centerY + Math.sin(angle) * radius * distanceFromCenter;
+        // Красивое свечение для центрального элемента
+        if (isMobile) {
+            // Упрощенная версия для мобильных
+            siriCore.style.background = 'rgb(0, 210, 255)';
+            siriCore.style.boxShadow = '0 0 15px rgba(0, 210, 255, 0.8)';
+        } else {
+            // Полная версия для десктопов
+            siriCore.style.background = 'radial-gradient(circle at center, rgba(255, 255, 255, 0.9), rgba(0, 210, 255, 0.8) 60%)';
+            siriCore.style.boxShadow = '0 0 20px rgba(0, 210, 255, 0.8), 0 0 30px rgba(0, 180, 230, 0.4)';
+        }
         
-        // Создаем элемент пикселя
-        const pixelElement = document.createElement('div');
+        siriCore.style.zIndex = '3';
         
-        // Общие свойства
-        pixelElement.style.position = 'absolute';
-        pixelElement.style.width = pixelSize + 'px';
-        pixelElement.style.height = pixelSize + 'px';
-        pixelElement.style.borderRadius = '50%';
-        pixelElement.style.zIndex = '1';
+        // Добавляем свечение вокруг аватара
+        const glow = document.createElement('div');
+        glow.className = 'avatar-glow';
+        glow.style.position = 'absolute';
+        glow.style.top = '50%';
+        glow.style.left = '50%';
+        glow.style.transform = 'translate(-50%, -50%)';
+        glow.style.width = '90%';
+        glow.style.height = '90%';
+        glow.style.borderRadius = '50%';
+        glow.style.background = 'radial-gradient(circle at center, rgba(0, 210, 255, 0.15) 30%, transparent 70%)';
+        glow.style.zIndex = '0';
         
-        // Позиция
-        pixelElement.style.left = (x * pixelSize) + 'px';
-        pixelElement.style.top = (y * pixelSize) + 'px';
+        // Добавляем все элементы в DOM
+        fragment.appendChild(siriCore);
+        fragment.appendChild(glow);
+        container.appendChild(fragment);
         
-        // Сохраняем данные для анимации
-        pixelElement.dataset.baseX = x * pixelSize;
-        pixelElement.dataset.baseY = y * pixelSize;
-        pixelElement.dataset.angle = angle;
-        pixelElement.dataset.distance = distanceFromCenter;
-        pixelElement.dataset.speed = 0.2 + Math.random() * 0.4; // Разная скорость
+        console.log("Аватар создан, запускаем анимацию");
         
-        // Цвет пикселя
-        const colorIndex = Math.floor(Math.random() * colors.length);
-        pixelElement.style.backgroundColor = colors[colorIndex];
-        
-        // Прозрачность
-        pixelElement.style.opacity = 0.6 + Math.random() * 0.4; // От 60% до 100%
-        
-        // Классы для анимаций
-        pixelElement.className = 'pixel siri-pixel';
-        
-        // Добавляем в фрагмент
-        fragment.appendChild(pixelElement);
+        // Запускаем плавную анимацию
+        startSmoothAnimation(container);
+    } catch (error) {
+        console.error("Ошибка при создании аватара:", error);
     }
-    
-    // Создаем яркий центральный элемент
-    const siriCore = document.createElement('div');
-    siriCore.className = 'siri-core';
-    siriCore.style.position = 'absolute';
-    siriCore.style.width = (gridSize * 0.2 * pixelSize) + 'px';
-    siriCore.style.height = (gridSize * 0.2 * pixelSize) + 'px';
-    siriCore.style.borderRadius = '50%';
-    siriCore.style.top = '50%';
-    siriCore.style.left = '50%';
-    siriCore.style.transform = 'translate(-50%, -50%)';
-    
-    // Красивое свечение для центрального элемента
-    if (isMobile) {
-        // Упрощенная версия для мобильных
-        siriCore.style.background = 'rgb(0, 210, 255)';
-        siriCore.style.boxShadow = '0 0 15px rgba(0, 210, 255, 0.8)';
-    } else {
-        // Полная версия для десктопов
-        siriCore.style.background = 'radial-gradient(circle at center, rgba(255, 255, 255, 0.9), rgba(0, 210, 255, 0.8) 60%)';
-        siriCore.style.boxShadow = '0 0 20px rgba(0, 210, 255, 0.8), 0 0 30px rgba(0, 180, 230, 0.4)';
-    }
-    
-    siriCore.style.zIndex = '3';
-    
-    // Добавляем свечение вокруг аватара
-    const glow = document.createElement('div');
-    glow.className = 'avatar-glow';
-    glow.style.position = 'absolute';
-    glow.style.top = '50%';
-    glow.style.left = '50%';
-    glow.style.transform = 'translate(-50%, -50%)';
-    glow.style.width = '90%';
-    glow.style.height = '90%';
-    glow.style.borderRadius = '50%';
-    glow.style.background = 'radial-gradient(circle at center, rgba(0, 210, 255, 0.15) 30%, transparent 70%)';
-    glow.style.zIndex = '0';
-    
-    // Добавляем все элементы в DOM
-    fragment.appendChild(siriCore);
-    fragment.appendChild(glow);
-    container.appendChild(fragment);
-    
-    // Запускаем плавную анимацию
-    startSmoothAnimation(container);
 }
 
 // Функция для плавной анимации аватара
 function startSmoothAnimation(container) {
+    if (!container) {
+        console.error("Контейнер для анимации не найден");
+        return;
+    }
+    
     const pixels = container.querySelectorAll('.siri-pixel');
+    console.log("Найдено пикселей для анимации:", pixels.length);
+    
+    if (pixels.length === 0) {
+        console.error("Пиксели для анимации не найдены");
+        return;
+    }
+    
     const isMobile = window.innerWidth < 768;
     
     // Запускаем анимацию с оптимальной частотой обновления
@@ -796,9 +1039,13 @@ function startSmoothAnimation(container) {
     
     // Анимация пульсации для центрального элемента
     const siriCore = container.querySelector('.siri-core');
-    if (siriCore && !isMobile) {
-        // Только для десктопов делаем анимацию пульсации
-        siriCore.style.animation = 'corePulse 4s infinite alternate';
+    if (siriCore) {
+        if (!isMobile) {
+            // Только для десктопов делаем анимацию пульсации
+            siriCore.style.animation = 'corePulse 4s infinite alternate';
+        }
+    } else {
+        console.error("Центральный элемент не найден");
     }
 }
 
