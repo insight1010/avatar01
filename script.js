@@ -4,6 +4,17 @@ document.addEventListener('DOMContentLoaded', function() {
     telegramWebApp.expand(); // Разворачиваем на весь экран
     telegramWebApp.ready(); // Сообщаем о готовности приложения
     
+    // Отключаем вертикальные свайпы для улучшения скроллинга
+    if (telegramWebApp.disableVerticalSwipes) {
+        telegramWebApp.disableVerticalSwipes();
+    }
+    
+    // Установка обработчика для исправления проблем со скроллингом
+    document.addEventListener('touchmove', function(e) {
+        // Разрешаем нативный скроллинг
+        e.stopPropagation();
+    }, { passive: false });
+    
     // Изменение стилей в соответствии с темой Telegram
     if (telegramWebApp.colorScheme === 'dark') {
         document.documentElement.style.setProperty('--bg-color', '#10002b');
@@ -41,27 +52,67 @@ document.addEventListener('DOMContentLoaded', function() {
         const input = userInput.value.trim();
         
         if (input.length > 0) {
-            // Очищаем ввод и закрываем модальное окно
+            // Добавляем введенные данные в терминал как команду
+            const terminalOutput = document.querySelector('.terminal-output');
+            const userCommand = document.createElement('p');
+            userCommand.className = 'command-msg';
+            userCommand.innerHTML = '$> ' + input;
+            terminalOutput.appendChild(userCommand);
+            
+            // Очищаем ввод
             userInput.value = '';
-            closeModal();
             
-            // Показываем уведомление об успешной отправке
-            telegramWebApp.showPopup({
-                title: 'Данные получены',
-                message: 'Информация обработана. Ваш аватар изучает вас!',
-                buttons: [{type: 'ok'}]
-            });
+            // Добавляем эффект обработки
+            const processingMsg = document.createElement('p');
+            processingMsg.className = 'system-msg';
+            processingMsg.innerHTML = 'Проверка API ключа...';
+            terminalOutput.appendChild(processingMsg);
             
-            // Обновляем прогресс
-            const currentProgress = parseInt(daysPassed.textContent);
-            if (currentProgress < 30) {
-                daysPassed.textContent = currentProgress + 1;
-                const newProgressPercent = ((currentProgress + 1) / 30) * 100;
-                progressFill.style.width = newProgressPercent + '%';
+            // Прокручиваем терминал вниз
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            
+            // Имитируем обработку с задержкой
+            setTimeout(() => {
+                const responseMsg = document.createElement('p');
+                responseMsg.className = 'system-msg';
+                responseMsg.innerHTML = 'API ключ принят. Начинаю сбор данных...';
+                terminalOutput.appendChild(responseMsg);
                 
-                // Проверяем, нужно ли разблокировать какие-то кнопки
-                checkButtonsUnlock(currentProgress + 1);
-            }
+                const successMsg = document.createElement('p');
+                successMsg.className = 'system-msg';
+                successMsg.innerHTML = '<span style="color: #38ef7d;">Успешно!</span> Данные получены.';
+                
+                // Добавляем с небольшой задержкой для эффекта обработки
+                setTimeout(() => {
+                    terminalOutput.appendChild(successMsg);
+                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                    
+                    // Закрываем терминал через некоторое время
+                    setTimeout(() => {
+                        closeModal();
+                        
+                        // Показываем уведомление об успешной отправке
+                        telegramWebApp.showPopup({
+                            title: 'API ключ принят',
+                            message: 'Авторизация успешна. Ваш аватар продолжает обучение!',
+                            buttons: [{type: 'ok'}]
+                        });
+                        
+                        // Обновляем прогресс
+                        const currentProgress = parseInt(daysPassed.textContent);
+                        if (currentProgress < 30) {
+                            daysPassed.textContent = currentProgress + 1;
+                            const newProgressPercent = ((currentProgress + 1) / 30) * 100;
+                            progressFill.style.width = newProgressPercent + '%';
+                            
+                            // Проверяем, нужно ли разблокировать какие-то кнопки
+                            checkButtonsUnlock(currentProgress + 1);
+                        }
+                    }, 2000);
+                }, 800);
+                
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }, 1500);
         }
     }
     

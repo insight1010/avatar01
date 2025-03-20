@@ -28,7 +28,7 @@
         
         <main>
             <div class="info-container">
-                <h2 id="digital-self-title" class="clickable-title">Ваше цифровое Я скоро родится</h2>
+                <h2 id="digital-self-title" class="clickable-title">Ваше цифровое Я<br>скоро родится</h2>
             </div>
             
             <div class="action-container">
@@ -49,12 +49,25 @@
         </main>
         
         <div id="modal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn">&times;</span>
-                <h2>Взаимодействие с аватаром</h2>
-                <div class="input-area">
-                    <textarea id="user-input" placeholder="Введите API Агента"></textarea>
-                    <button id="submit-input" class="action-button btn-1">Отправить</button>
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-title">INSIGHT-1010 TERMINAL</div>
+                    <span class="close-btn">&times;</span>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-output">
+                        <p class="system-msg">Инициализация системы Insight 1010...</p>
+                        <p class="system-msg">Статус: <span class="status-online">ONLINE</span></p>
+                        <p class="system-msg">Версия: 0.4.3 [BETA]</p>
+                        <p class="system-msg">===============================</p>
+                        <p class="command-msg">$> Доступ к системе требует авторизации</p>
+                        <p class="command-msg">$> Введите API ключ агента:</p>
+                    </div>
+                    <div class="terminal-input-line">
+                        <span class="prompt">$></span>
+                        <textarea id="user-input" placeholder="Введите API Агента"></textarea>
+                    </div>
+                    <button id="submit-input" class="terminal-btn">АВТОРИЗАЦИЯ</button>
                 </div>
             </div>
         </div>
