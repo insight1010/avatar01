@@ -32,14 +32,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const connectArBtn = document.getElementById('connect-ar-btn');
     const modal = document.getElementById('modal');
     const infoModal = document.getElementById('info-modal');
+    const botModal = document.getElementById('bot-modal');
     const closeBtn = document.querySelector('.close-btn');
     const infoCloseBtn = document.querySelector('.info-close-btn');
+    const botCloseBtn = document.querySelector('.bot-close-btn');
     const submitInput = document.getElementById('submit-input');
     const userInput = document.getElementById('user-input');
     const digitalSelfTitle = document.getElementById('digital-self-title');
     const pixelAvatar = document.getElementById('pixel-avatar');
     const progressFill = document.querySelector('.progress-fill');
     const daysPassed = document.querySelector('.days-passed');
+    const connectTelegramBtn = document.getElementById('connect-telegram-btn');
     
     // Создание пиксельного аватара
     createPixelAvatar(pixelAvatar);
@@ -185,12 +188,36 @@ document.addEventListener('DOMContentLoaded', function() {
         infoModal.style.display = 'none';
     }
     
+    // Открытие модального окна бота
+    function openBotModal() {
+        botModal.style.display = 'flex';
+    }
+    
+    // Закрытие модального окна бота
+    function closeBotModal() {
+        botModal.style.display = 'none';
+    }
+    
     // Обработчики событий
     interactBtn.addEventListener('click', openModal);
     closeBtn.addEventListener('click', closeModal);
     submitInput.addEventListener('click', handleUserSubmit);
     digitalSelfTitle.addEventListener('click', openInfoModal);
     infoCloseBtn.addEventListener('click', closeInfoModal);
+    botCloseBtn.addEventListener('click', closeBotModal);
+    
+    // Добавляем обработчик для новой кнопки бота
+    const telegramBotBtn = document.getElementById('telegram-bot-btn');
+    telegramBotBtn.addEventListener('click', openBotModal);
+    
+    // Обработчик для кнопки подключения к боту внутри модального окна
+    connectTelegramBtn.addEventListener('click', function() {
+        // Закрываем модальное окно
+        closeBotModal();
+        
+        // Открываем бота в Telegram
+        openTelegramBot();
+    });
     
     // Закрываем модальные окна по клику вне их содержимого
     window.addEventListener('click', function(event) {
@@ -199,6 +226,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (event.target === infoModal) {
             closeInfoModal();
+        }
+        if (event.target === botModal) {
+            closeBotModal();
         }
     });
     
@@ -474,4 +504,46 @@ function createDigitalParticles() {
         
         container.appendChild(element);
     }
+}
+
+// Функция для открытия Telegram бота
+function openTelegramBot() {
+    // Открываем ссылку на бота
+    window.open("https://t.me/mamayadoma_bot", "_blank");
+    
+    // Альтернативный способ через API Telegram
+    try {
+        telegramWebApp.openTelegramLink("https://t.me/mamayadoma_bot");
+    } catch (e) {
+        console.log("Ошибка открытия ссылки через Telegram API:", e);
+    }
+    
+    // Обновляем прогресс
+    const currentProgress = parseInt(daysPassed.textContent);
+    if (currentProgress < 30) {
+        daysPassed.textContent = currentProgress + 1;
+        const newProgressPercent = ((currentProgress + 1) / 30) * 100;
+        progressFill.style.width = newProgressPercent + '%';
+        
+        // Проверяем, нужно ли разблокировать какие-то кнопки
+        checkButtonsUnlock(currentProgress + 1);
+    }
+}
+
+// Функция для активации и перехода к боту
+function activateTelegramBot() {
+    // Показываем уведомление о подключении бота
+    telegramWebApp.showPopup({
+        title: 'Подключение к боту',
+        message: 'Переход к вашему цифровому я в Telegram. Для активации просто отправьте команду /start боту.',
+        buttons: [{
+            id: "open_bot",
+            type: "default",
+            text: "Открыть бота"
+        }]
+    }, function(buttonId) {
+        if (buttonId === "open_bot") {
+            openTelegramBot();
+        }
+    });
 } 

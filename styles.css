@@ -798,4 +798,135 @@ h1 {
     color: #00d2ff;
     animation: blink 1s infinite;
     margin-left: -5px;
+}
+
+/* Новая кнопка для бота с эффектом свечения */
+.btn-glow {
+    background: linear-gradient(45deg, #240046, #3c096c);
+    border: 2px solid #6a00f4;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-glow::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(106, 0, 244, 0.2);
+    transform: rotate(30deg);
+    animation: glowEffect 3s infinite;
+}
+
+@keyframes glowEffect {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) rotate(30deg);
+    }
+    20% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(50%, 50%) rotate(30deg);
+    }
+}
+
+/* Стили для модального окна бота */
+.bot-modal-content {
+    max-width: 550px;
+}
+
+.bot-section {
+    display: flex;
+    align-items: center;
+    background: rgba(10, 20, 30, 0.6);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border-left: 3px solid #6a00f4;
+}
+
+.bot-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 1rem;
+    background: #240046;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(106, 0, 244, 0.5);
+}
+
+.bot-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bot-info {
+    flex: 1;
+}
+
+.bot-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    color: #00d2ff;
+}
+
+.status-tag {
+    display: inline-block;
+    background: rgba(56, 239, 125, 0.2);
+    color: #38ef7d;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.command-block {
+    background: rgba(10, 20, 30, 0.8);
+    border-left: 3px solid #6a00f4;
+    padding: 0.8rem 1rem;
+    font-family: 'Courier New', monospace;
+    color: #00d2ff;
+    font-weight: bold;
+    margin: 1rem 0;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.telegram-connect {
+    text-align: center;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: rgba(10, 20, 30, 0.4);
+    border-radius: 8px;
+}
+
+.telegram-btn {
+    background: linear-gradient(45deg, #0088cc, #0099ff);
+    border: none;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-top: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+}
+
+.telegram-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 136, 204, 0.4);
+}
+
+.telegram-btn:active {
+    transform: translateY(0);
 } 
