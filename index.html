@@ -100,6 +100,9 @@
             </div>
             
             <div class="action-container">
+                <button id="activate-avatar-btn" class="action-button btn-main">
+                    Активировать аватар
+                </button>
                 <button id="add-bot-btn" class="action-button btn-2 locked">
                     Добавить бот в чаты
                     <span class="lock-icon">⏱️ 3д</span>
@@ -199,6 +202,49 @@
                     
                     <p class="additional-info">
                         Telegram бот — ваш персональный ИИ-ассистент, который растёт и развивается вместе с вами. 
+                        Он учится понимать ваш стиль общения, жизненные цели и стратегии, становясь точным отражением 
+                        вашей личности с каждым днём. Через год он сможет заменить 95% ваших дел в интернете.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="activate-modal" class="modal">
+            <div class="modal-content activate-modal-content">
+                <span class="close-btn activate-close-btn">&times;</span>
+                <h2>Активация аватара</h2>
+                <div class="info-details">
+                    <div class="bot-section">
+                        <div class="bot-avatar">
+                            <img src="https://t.me/LivingAvatar_Bot/avatar" alt="Бот Insight-1010" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect fill=\'%23240046\' width=\'100\' height=\'100\' rx=\'50\'/><text fill=\'%2300d2ff\' font-family=\'Arial\' font-size=\'40\' text-anchor=\'middle\' x=\'50\' y=\'60\'>Я</text></svg>';">
+                        </div>
+                        <div class="bot-info">
+                            <h3>@LivingAvatar_Bot</h3>
+                            <p class="status-tag">ONLINE</p>
+                        </div>
+                    </div>
+                    
+                    <p>Что умеет ваш Telegram бот:</p>
+                    <ul>
+                        <li>Собирать данные о вашем поведении и предпочтениях</li>
+                        <li>Анализировать ваш стиль общения для более точной имитации</li>
+                        <li>Хранить важную информацию в зашифрованном виде</li>
+                        <li>Предоставлять доступ к настройкам вашего цифрового я</li>
+                    </ul>
+                    
+                    <div class="telegram-connect">
+                        <p>Для активации аватара:</p>
+                        <ol style="text-align: left; padding-left: 20px; margin-bottom: 15px;">
+                            <li>Нажмите кнопку "Активировать" ниже</li>
+                            <li>В открывшемся окне Telegram нажмите кнопку START</li>
+                            <li>Если кнопка START не отображается, отправьте команду:</li>
+                        </ol>
+                        <div class="command-block">/start</div>
+                        <button id="activate-bot-btn" class="telegram-btn">Активировать</button>
+                    </div>
+                    
+                    <p class="additional-info">
+                        Ваш аватар — это персональный ИИ-ассистент, который растёт и развивается вместе с вами. 
                         Он учится понимать ваш стиль общения, жизненные цели и стратегии, становясь точным отражением 
                         вашей личности с каждым днём. Через год он сможет заменить 95% ваших дел в интернете.
                     </p>

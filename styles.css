@@ -575,6 +575,21 @@ h1 {
     box-shadow: 0 4px 15px rgba(193, 82, 192, 0.3);
 }
 
+.btn-main {
+    background: linear-gradient(135deg, #00d2ff, #3a47d5);
+    box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
+    animation: pulseButton 2s infinite alternate;
+}
+
+@keyframes pulseButton {
+    0% {
+        box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
+    }
+    100% {
+        box-shadow: 0 4px 20px rgba(0, 210, 255, 0.7), 0 0 15px rgba(58, 71, 213, 0.5);
+    }
+}
+
 .btn-2 {
     background: linear-gradient(135deg, #00c6ff, #0072ff);
     box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3);
@@ -1235,4 +1250,20 @@ h1 {
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Стили для модального окна активации */
+.activate-modal-content {
+    max-width: 550px;
+    background: linear-gradient(180deg, rgba(36, 0, 70, 0.95) 0%, rgba(16, 0, 43, 0.95) 100%);
+    border: 1px solid rgba(0, 210, 255, 0.3);
+    box-shadow: 0 0 30px rgba(0, 210, 255, 0.2);
+}
+
+.activate-modal-content h2 {
+    color: #00d2ff;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
 } 

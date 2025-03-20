@@ -119,12 +119,15 @@ function initApp() {
     const addBotBtn = document.getElementById('add-bot-btn');
     const connectChatsBtn = document.getElementById('connect-chats-btn');
     const connectArBtn = document.getElementById('connect-ar-btn');
+    const activateAvatarBtn = document.getElementById('activate-avatar-btn');
     const modal = document.getElementById('modal');
     const infoModal = document.getElementById('info-modal');
     const botModal = document.getElementById('bot-modal');
+    const activateModal = document.getElementById('activate-modal');
     const closeBtn = document.querySelector('.close-btn');
     const infoCloseBtn = document.querySelector('.info-close-btn');
     const botCloseBtn = document.querySelector('.bot-close-btn');
+    const activateCloseBtn = document.querySelector('.activate-close-btn');
     const submitInput = document.getElementById('submit-input');
     const userInput = document.getElementById('user-input');
     const digitalSelfTitle = document.getElementById('digital-self-title');
@@ -406,6 +409,7 @@ function initApp() {
     digitalSelfTitle.addEventListener('click', openInfoModal);
     infoCloseBtn.addEventListener('click', closeInfoModal);
     botCloseBtn.addEventListener('click', closeBotModal);
+    activateCloseBtn.addEventListener('click', closeActivateModal);
     
     // Обработчик для кнопок с блокировкой - универсальная функция
     function handleLockedButton(e) {
@@ -907,6 +911,42 @@ function initApp() {
                         'Заблокирован:', e.target.classList.contains('locked'));
         }
     }, { passive: true });
+
+    // Функция для открытия модального окна активации
+    function openActivateModal() {
+        activateModal.style.display = 'flex';
+        
+        // Показываем кнопку назад в Telegram WebApp
+        if (telegramWebApp.BackButton) {
+            telegramWebApp.BackButton.show();
+            telegramWebApp.BackButton.onClick(() => {
+                closeActivateModal();
+            });
+        }
+    }
+
+    // Закрытие модального окна активации
+    function closeActivateModal() {
+        activateModal.style.display = 'none';
+        
+        // Скрываем кнопку назад
+        if (telegramWebApp.BackButton) {
+            telegramWebApp.BackButton.hide();
+        }
+    }
+
+    // Добавляем обработчик для новой кнопки активации аватара
+    activateAvatarBtn.addEventListener('click', openActivateModal);
+
+    // Добавляем обработчик для кнопки активации в модальном окне
+    const activateBotBtn = document.getElementById('activate-bot-btn');
+    activateBotBtn.addEventListener('click', function() {
+        // Закрываем модальное окно
+        closeActivateModal();
+        
+        // Открываем бота в Telegram
+        openTelegramBot();
+    });
 }
 
 // Функция для создания пиксельного аватара с плавными анимациями
